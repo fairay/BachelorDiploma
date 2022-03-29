@@ -1,35 +1,11 @@
 from typing import List, Optional, Dict
+from geonode import *
 
 
 class Transport:
     def __init__(self):
         self.volume: float = 0
         self.cons: float = 0
-
-
-class GeoNode:
-    def __init__(self, name=""):
-        self.name: str = name
-
-    def __str__(self):
-        return self.name
-
-
-class Warehouse(GeoNode):
-    def __init__(self, stock: Dict[str, int]):
-        super().__init__()
-        self.stock = stock
-
-
-class Parking(GeoNode):
-    def __init__(self):
-        super(Parking, self).__init__('Стоянка')
-
-
-class Consumer(GeoNode):
-    def __init__(self, order: Dict[str, int]):
-        super().__init__()
-        self.order = order
 
 
 class Route:
@@ -39,7 +15,6 @@ class Route:
 
 class TransportSystem:
     def __init__(self):
-        self.nodes: List[GeoNode] = []
         self.transport: List[Transport] = []
         self.routes: List[Route] = []
 
@@ -52,25 +27,40 @@ class TransportSystem:
 
     def add_warehouse(self, node: Warehouse):
         self.warehouses.append(node)
-        self.nodes.append(node)
 
     def add_consumer(self, node: Consumer):
         self.consumers.append(node)
-        self.nodes.append(node)
 
     def add_parking(self, node: Parking):
-        if self.parking:
-            self.nodes.remove(self.parking)
-
         self.parking = node
-        self.nodes.append(node)
+
+    def add_transport(self, truck: Transport):
+        self.transport.append(truck)
+
+    def add_link(self, ind1: int, ind2: int, dist=1.0, time=1.0):
+        if max(ind1, ind2) >= len(self.node_arr) or min(ind1, ind2) < 0 or ind1 == ind2:
+            raise Exception('Wrong index')
+
+        obj1 = self.node_arr[ind1]
+        obj2 = self.node_arr[ind2]
+        obj1.add_node(obj2, dist, time)
+        obj2.add_node(obj1, dist, time)
 
     def calc_routes(self):
         self._init_routes()
         self._main_routes()
 
     def _init_routes(self):
-        pass
+        path_len = []
+        # for node in self.warehouses:
 
     def _main_routes(self):
         pass
+
+    def _get_nodes(self) -> List[GeoNode]:
+        res = [self.parking] if self.parking is not None else []
+        res += self.warehouses
+        res += self.consumers
+        return res
+
+    node_arr = property(_get_nodes)
