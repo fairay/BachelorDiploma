@@ -1,8 +1,8 @@
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QSpacerItem, QSizePolicy, QPushButton
+from PyQt5 import QtGui
+from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QSpacerItem, QSizePolicy
 
-from geonode import GeoNode, Warehouse
-from ui.node_dialog import NodeDialog
+from entities.geonode import GeoNode, Warehouse
+from ui.node_dialog import NodeDialog, WarehouseDialog
 from typing import Callable, Any, Type
 
 
@@ -19,13 +19,6 @@ class ListField(QWidget):
         self.layout.addWidget(self.titleW)
 
         self.layout.addItem(QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum))
-
-        # self.editW = QPushButton("📝")
-        # self.editW.setMaximumWidth(40)
-        # self.editW.clicked.connect(self.clickEvent)
-        # self.layout.addWidget(self.editW)
-
-        # setStyleSheet
         self.titleW.setStyleSheet(''' color: rgb(255, 0, 0); ''')
 
     def mouseDoubleClickEvent(self, a0: QtGui.QMouseEvent) -> None:
@@ -36,7 +29,10 @@ class ListField(QWidget):
         self.titleW.setText(self.node.name)
 
     def clickEvent(self):
-        pass
+        try:
+            self.show_dialog(WarehouseDialog, self.node)
+        except Exception as e:
+            print(e)
 
     def closeEvent(self, event):
         print('onePopUp : close event')
@@ -45,11 +41,3 @@ class ListField(QWidget):
 class WarehouseField(ListField):
     def __init__(self, node: Warehouse, show_dialog: Callable[[Type[NodeDialog], GeoNode], Any]):
         super(WarehouseField, self).__init__(node, show_dialog)
-
-    def clickEvent(self):
-        self.show_dialog(NodeDialog, self.node)
-        #
-        # form = NodeDialog(self.node)
-        # form.exec_()
-
-        print("Warehouse")

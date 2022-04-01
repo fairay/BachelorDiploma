@@ -5,25 +5,35 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QHBoxLayout, QSpacerItem, QSizePolicy, QVBoxLayout, QLineEdit, QPushButton, \
     QWidget, QListWidgetItem, QListWidget, QComboBox, QDoubleSpinBox
 
-from geonode import *
-from transport import TransportSystem
+from entities.geonode import *
+from entities.system import TransportSystem
 
 
 class LinkField(QWidget):
-    def __init__(self, node: GeoNode):
-        super(LinkField, self).__init__(parent=None)
+    def __init__(self, parent, node: GeoNode, options: List[GeoNode]):
+        super(LinkField, self).__init__(parent=parent)
 
         self.node = node
+        self.options = options
+        self.initUI()
+        self.initBinds()
 
+    def initUI(self):
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
 
         self.nodeW = QComboBox()
-        self.nodeW.addItem(node.name)
+        self.nodeW.addItem(self.node.name)
+        for other in self.options:
+            self.nodeW.addItem(other.name)
+
+        # print("this", self.nodeW.model().item(1).setEnabled(False))
+        # print("this", self.nodeW.model().item(1).setBackground(QBrush(QColor(150, 150, 150))))
+
         self.nodeW.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
         self.layout.addWidget(self.nodeW)
 
-        self.space = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.space = QSpacerItem(30, 10, QSizePolicy.Fixed, QSizePolicy.Minimum)
         self.layout.addItem(self.space)
 
         self.distW = QDoubleSpinBox()
@@ -44,6 +54,12 @@ class LinkField(QWidget):
         # setStyleSheet
         self.nodeW.setStyleSheet(''' color: rgb(255, 0, 0); ''')
 
+    def initBinds(self):
+        self.nodeW.currentIndexChanged.connect(self.indexChanged)
+
+    def indexChanged(self, index: int):
+        print("Changed to", index)
+
     def setTextUp(self, text):
         self.textUpQLabel.setText(text)
 
@@ -55,6 +71,7 @@ class LinkField(QWidget):
 
     def closeEvent(self, event):
         print('onePopUp : close event')
+
 
 
 class NodeDialog(QDialog):
@@ -74,50 +91,76 @@ class NodeDialog(QDialog):
         cnt = QHBoxLayout(self)
         self.setLayout(cnt)
 
-        content = QVBoxLayout()
+        self.content = QVBoxLayout()
+        content = self.content
         content.setAlignment(Qt.AlignTop)
         content.setContentsMargins(3, 3, 3, 5)
+        content.setSpacing(10)
 
-        cnt.addItem(QSpacerItem(100, 10, QSizePolicy.Fixed, QSizePolicy.Minimum))
+        cnt.addItem(QSpacerItem(40, 10, QSizePolicy.Fixed, QSizePolicy.Minimum))
         cnt.addItem(content)
-        cnt.addItem(QSpacerItem(100, 10, QSizePolicy.Fixed, QSizePolicy.Minimum))
+        cnt.addItem(QSpacerItem(40, 10, QSizePolicy.Fixed, QSizePolicy.Minimum))
 
         #
         name_edit = QLineEdit(self.node.name, self)
         content.addWidget(name_edit)
 
-        self.link_list = QListWidget(self)
-        content.addWidget(self.link_list)
-
-        apply_btn = QPushButton("Добавить связь", self)
-        content.addWidget(apply_btn)
-        self.space = QSpacerItem(10, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        content.addItem(self.space)
-
-        apply_btn = QPushButton("Применить", self)
-        content.addWidget(apply_btn)
-
-        delete_btn = QPushButton("Удалить", self)
-        content.addWidget(delete_btn)
+        self.links_UI()
+        self.additional_UI()
+        self.buttons_UI()
 
         self._init_links()
 
-    def add_link(self, other: GeoNode):
-        try:
-            widget = LinkField(other)
+    def links_UI(self):
+        layout = QVBoxLayout()
 
-            item = QListWidgetItem(self.link_list)
-            item.setSizeHint(widget.sizeHint())
-            self.link_list.addItem(item)
-            self.link_list.setItemWidget(item, widget)
-        except Exception as e:
-            print(e)
+        self.link_list = QListWidget(self)
+        layout.addWidget(self.link_list)
+
+        apply_btn = QPushButton("Добавить связь", self)
+        layout.addWidget(apply_btn)
+
+        self.content.addItem(layout)
+        return layout
+
+    def buttons_UI(self):
+        layout = QVBoxLayout()
+
+        applyW = QPushButton("Применить", self)
+        applyW.clicked.connect(self.apply)
+        layout.addWidget(applyW)
+
+        layout.addWidget(QPushButton("Удалить", self))
+
+        self.content.addItem(layout)
+
+    def additional_UI(self):
+        pass
+
+    def apply(self):
+        print('OK')
+        self.close()
+
+    def add_link(self, other: GeoNode):
+        widget = LinkField(self, other, self.sys.unlinked(self.node))
+
+        item = QListWidgetItem(self.link_list)
+        item.setSizeHint(widget.sizeHint())
+        self.link_list.addItem(item)
+        self.link_list.setItemWidget(item, widget)
 
     def _init_links(self):
         for other in self.node.linked.keys():
             self.add_link(other)
 
-
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         print("canceled", self.node.name, "->", self.source_node.name)
         # self.node = self.source_node
+
+class WarehouseDialog(NodeDialog):
+    def __init__(self, node: Warehouse, sys: TransportSystem):
+        super(WarehouseDialog, self).__init__(node, sys)
+
+    def additional_UI(self):
+        apply_btn = QPushButton("Something for Warehouse", self)
+        self.content.addWidget(apply_btn)

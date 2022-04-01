@@ -5,7 +5,8 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QListWidgetItem
 import plotly
 
-from transport import *
+from entities.system import TransportSystem
+from entities.transport import *
 from interface import *
 from graphics import get_figure
 from ui.node_dialog import NodeDialog
@@ -13,7 +14,7 @@ from ui.node_dialog import NodeDialog
 from ui.node_list import WarehouseField, ListField
 
 
-def main():
+def init_system():
     trans = TransportSystem()
 
     p = Parking()
@@ -70,17 +71,24 @@ class MainWin(QtWidgets.QMainWindow):
         self.sys.add_link(0, 1)
         self.show_node(WarehouseField(node, self.show_dialog))
 
+        node = Warehouse({}, "Склад №3")
+        self.sys.add_warehouse(node)
+        self.sys.add_link(1, 2)
+        self.show_node(WarehouseField(node, self.show_dialog))
 
     def show_dialog(self, dialog: Type[NodeDialog], node: GeoNode):
         form = dialog(node, self.sys)
         form.exec_()
 
-
-if __name__ == '__main__':
-    main()
+def main():
     global app, application
+
+    init_system()
     app = QtWidgets.QApplication([])
     application = MainWin()
     application.show()
 
     sys.exit(app.exec())
+
+if __name__ == '__main__':
+    main()

@@ -1,16 +1,7 @@
-from typing import List, Optional, Dict
-from geonode import *
+from typing import List, Optional
 
-
-class Transport:
-    def __init__(self):
-        self.volume: float = 0
-        self.cons: float = 0
-
-
-class Route:
-    def __init__(self, parking: Parking):
-        self.nodes: List[GeoNode] = [parking]
+from entities.geonode import Parking, Warehouse, Consumer, GeoNode
+from entities.transport import Transport, Route
 
 
 class TransportSystem:
@@ -45,6 +36,12 @@ class TransportSystem:
         obj2 = self.node_arr[ind2]
         obj1.add_node(obj2, dist, time)
         obj2.add_node(obj1, dist, time)
+
+    def unlinked(self, node: GeoNode):
+        return list(filter(
+            lambda other: not (node.is_linked(other) or node == other),
+            self.node_arr
+        ))
 
     def calc_routes(self):
         self._init_routes()
