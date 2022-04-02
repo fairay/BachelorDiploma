@@ -1,4 +1,4 @@
-from geonode import *
+from .geonode import *
 
 
 class Transport:

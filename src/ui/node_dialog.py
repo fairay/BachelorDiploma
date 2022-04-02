@@ -1,4 +1,4 @@
-from copy import copy
+from copy import copy, deepcopy
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
@@ -23,10 +23,10 @@ class LinkField(QWidget):
         self.setLayout(self.layout)
 
         self.nodeW = QComboBox()
-        self.nodeW.addItem(self.node.name)
         for other in self.options:
             self.nodeW.addItem(other.name)
 
+        self.nodeW.setCurrentIndex(self.options.index(self.node))
         # print("this", self.nodeW.model().item(1).setEnabled(False))
         # print("this", self.nodeW.model().item(1).setBackground(QBrush(QColor(150, 150, 150))))
 
@@ -58,7 +58,7 @@ class LinkField(QWidget):
         self.nodeW.currentIndexChanged.connect(self.indexChanged)
 
     def indexChanged(self, index: int):
-        print("Changed to", index)
+        pass
 
     def setTextUp(self, text):
         self.textUpQLabel.setText(text)
@@ -70,8 +70,7 @@ class LinkField(QWidget):
         pass
 
     def closeEvent(self, event):
-        print('onePopUp : close event')
-
+        pass
 
 
 class NodeDialog(QDialog):
@@ -102,8 +101,8 @@ class NodeDialog(QDialog):
         cnt.addItem(QSpacerItem(40, 10, QSizePolicy.Fixed, QSizePolicy.Minimum))
 
         #
-        name_edit = QLineEdit(self.node.name, self)
-        content.addWidget(name_edit)
+        self.nameW = QLineEdit(self.node.name, self)
+        content.addWidget(self.nameW)
 
         self.links_UI()
         self.additional_UI()
@@ -137,12 +136,19 @@ class NodeDialog(QDialog):
     def additional_UI(self):
         pass
 
+    def update_node(self):
+        self.node.name = self.nameW.text()
+
     def apply(self):
-        print('OK')
+        self.update_node()
+        self.source_node.update(self.node)
         self.close()
+        print('Applied')
 
     def add_link(self, other: GeoNode):
-        widget = LinkField(self, other, self.sys.unlinked(self.node))
+        node_list = self.sys.node_arr
+        node_list.remove(self.source_node)
+        widget = LinkField(self, other, node_list)
 
         item = QListWidgetItem(self.link_list)
         item.setSizeHint(widget.sizeHint())
@@ -154,7 +160,7 @@ class NodeDialog(QDialog):
             self.add_link(other)
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
-        print("canceled", self.node.name, "->", self.source_node.name)
+        pass
         # self.node = self.source_node
 
 class WarehouseDialog(NodeDialog):

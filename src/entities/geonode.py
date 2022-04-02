@@ -1,4 +1,5 @@
-from typing import List, Optional, Dict
+from copy import copy
+from typing import *
 
 
 class GeoNode(object):
@@ -12,30 +13,48 @@ class GeoNode(object):
     def __repr__(self):
         return self.name
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'GeoNode'):
         return isinstance(other, type(self)) and self.name == other.name
 
     def __hash__(self):
         return id(self)
 
-    def dist(self, other):
+    def __copy__(self):
+        new = GeoNode(self.name)
+        new.linked = copy(self.linked)
+        return new
+
+    def dist(self, other: 'GeoNode'):
         return self.linked[other]['dist'] if self.is_linked(other) else None
 
-    def time(self, other):
+    def time(self, other: 'GeoNode'):
         return self.linked[other]['time'] if self.is_linked(other) else None
 
-    def add_node(self, other, dist=1.0, time=1.0, symmetric=True):
+    def add_node(self, other: 'GeoNode', dist=1.0, time=1.0, symmetric=True):
         self.linked[other] = {'dist': dist, 'time': time}
         if symmetric:
             other.linked[self] = {'dist': dist, 'time': time}
 
-    def delete_node(self, other, symmetric=True):
+    def delete_node(self, other: 'GeoNode', symmetric=True):
+        if not self.is_linked(other):
+            return
         self.linked.pop(other)
         if symmetric:
-            other.linked.pop(self)
+            other.delete_node(self, False)
 
-    def is_linked(self, other):
+    def unlink(self):
+        keys = self.linked.keys()
+        for other in list(keys):
+            self.delete_node(other)
+
+    def is_linked(self, other: 'GeoNode'):
         return other in self.linked.keys()
+
+    def update(self, other: 'GeoNode'):
+        self.name = other.name
+        self.unlink()
+        for node, data in other.linked.items():
+            self.add_node(node, *data)
 
 
 class Warehouse(GeoNode):
