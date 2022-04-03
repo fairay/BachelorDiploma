@@ -35,7 +35,6 @@ class TransportSystem:
         obj1 = self.node_arr[ind1]
         obj2 = self.node_arr[ind2]
         obj1.add_node(obj2, dist, time)
-        obj2.add_node(obj1, dist, time)
 
     def unlinked(self, node: GeoNode):
         return list(filter(

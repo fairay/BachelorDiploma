@@ -54,7 +54,7 @@ class GeoNode(object):
         self.name = other.name
         self.unlink()
         for node, data in other.linked.items():
-            self.add_node(node, *data)
+            self.add_node(node, **data)
 
 
 class Warehouse(GeoNode):
