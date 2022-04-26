@@ -11,12 +11,13 @@ from interface import *
 from graphics import get_figure
 from ui.node_dialog import NodeDialog
 
-from ui.node_list import WarehouseField, ListField
+from ui.node_list import WarehouseField, ListField, ParkingField
 
 
 def init_system():
     tsys = TransportSystem()
 
+    tsys.add_parking(Parking())
     tsys.add_warehouse(Warehouse({}, "Склад №1"))
     tsys.add_warehouse(Warehouse({}, "Склад №2"))
     tsys.add_warehouse(Warehouse({}, "Склад №3"))
@@ -77,8 +78,7 @@ class MainWin(QtWidgets.QMainWindow):
     def update_list(self):
         self.clean_list()
         if self.sys.parking:
-            # self.show_node(ParkingField(self.sys.parking, self.show_dialog))
-            pass
+            self.show_node(ParkingField(self.sys.parking, self.show_dialog))
 
         for node in self.sys.warehouses:
             self.show_node(WarehouseField(node, self.show_dialog))

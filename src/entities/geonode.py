@@ -64,8 +64,8 @@ class Warehouse(GeoNode):
 
 
 class Parking(GeoNode):
-    def __init__(self):
-        super(Parking, self).__init__('Стоянка')
+    def __init__(self, name='Стоянка'):
+        super(Parking, self).__init__(name)
 
 
 class Consumer(GeoNode):

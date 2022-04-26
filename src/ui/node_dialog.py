@@ -1,91 +1,16 @@
-from copy import copy, deepcopy
-
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QHBoxLayout, QSpacerItem, QSizePolicy, QVBoxLayout, QLineEdit, QPushButton, \
-    QWidget, QListWidgetItem, QListWidget, QComboBox, QDoubleSpinBox, QErrorMessage, QMessageBox
+    QListWidgetItem, QListWidget, QMessageBox
 
 from entities.geonode import *
 from entities.system import TransportSystem
-
-
-class LinkField(QWidget):
-    def __init__(self, parent, node: GeoNode, options: List[GeoNode]):
-        super(LinkField, self).__init__(parent=parent)
-
-        self.node = node
-        self.options = options
-        self.initUI()
-        self.initBinds()
-
-    def initUI(self):
-        self.layout = QHBoxLayout()
-        self.setLayout(self.layout)
-
-        self.nodeW = QComboBox()
-        for other in self.options:
-            self.nodeW.addItem(other.name)
-
-        self.nodeW.setCurrentIndex(self.options.index(self.node))
-        # print("this", self.nodeW.model().item(1).setEnabled(False))
-        # print("this", self.nodeW.model().item(1).setBackground(QBrush(QColor(150, 150, 150))))
-
-        self.nodeW.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
-        self.layout.addWidget(self.nodeW)
-
-        self.space = QSpacerItem(30, 10, QSizePolicy.Fixed, QSizePolicy.Minimum)
-        self.layout.addItem(self.space)
-
-        dist = self.parent().node.dist(self.node) if self.parent().node.is_linked(self.node) else 1.0
-        self.distW = QDoubleSpinBox()
-        self.distW.setValue(dist)
-        self.distW.setFrame(0)
-        self.layout.addWidget(self.distW)
-
-        time = self.parent().node.time(self.node) if self.parent().node.is_linked(self.node) else 1.0
-        self.timeW = QDoubleSpinBox()
-        self.timeW.setValue(time)
-        self.timeW.setFrame(0)
-        self.layout.addWidget(self.timeW)
-
-        self.editButton = QPushButton("🗑️")
-        self.editButton.setMaximumWidth(30)
-        self.editButton.clicked.connect(self.clickEvent)
-        self.layout.addWidget(self.editButton)
-
-        # setStyleSheet
-        self.nodeW.setStyleSheet('color: rgb(255, 0, 0);')
-
-    def initBinds(self):
-        self.nodeW.currentIndexChanged.connect(self.indexChanged)
-
-    def indexChanged(self, index: int):
-        self.node = self.options[index]
-
-    def setTextUp(self, text):
-        self.textUpQLabel.setText(text)
-
-    def setTextDown(self, text):
-        self.node_widget.setText(text)
-
-    def clickEvent(self):
-        self.parent().parent().parent().delete_link(self)
-
-    def closeEvent(self, event):
-        pass
-
-    @property
-    def dist(self) -> float: return self.distW.value()
-    @dist.setter
-    def dist(self, value: float): self.distW.setValue(value)
-
-    @property
-    def time(self) -> float: return self.timeW.value()
-    @time.setter
-    def time(self, value: float): self.timeW.setValue(value)
+from ui.fields import LinkField
 
 
 class NodeDialog(QDialog):
+    window_title = '...'
+
     def __init__(self, node: GeoNode, sys: TransportSystem):
         super().__init__()
         self.node = copy(node)
@@ -96,7 +21,7 @@ class NodeDialog(QDialog):
 
     def init_UI(self):
         self.setMinimumSize(600, 300)
-        self.setWindowTitle('Параметры склада')
+        self.setWindowTitle(self.window_title)
         self.setWindowModality(Qt.ApplicationModal)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
 
@@ -142,7 +67,9 @@ class NodeDialog(QDialog):
         applyW.clicked.connect(self.apply)
         layout.addWidget(applyW)
 
-        layout.addWidget(QPushButton("Удалить", self))
+        deleteW = QPushButton("Удалить", self)
+        deleteW.clicked.connect(self.delete)
+        layout.addWidget(deleteW)
 
         self.content.addItem(layout)
 
@@ -185,6 +112,9 @@ class NodeDialog(QDialog):
         self.close()
         print('Applied')
 
+    def delete(self):
+        pass
+
     def add_new_link(self):
         node_list = self.sys.node_arr
         node_list.remove(self.source_node)
@@ -225,7 +155,20 @@ class NodeDialog(QDialog):
         # self.node = self.source_node
 
 
+class ParkingDialog(NodeDialog):
+    window_title = 'Параметры стоянки'
+
+    def __init__(self, node: Warehouse, sys: TransportSystem):
+        super(ParkingDialog, self).__init__(node, sys)
+
+    def additional_UI(self):
+        apply_btn = QPushButton("Something for Parking", self)
+        self.content.addWidget(apply_btn)
+
+
 class WarehouseDialog(NodeDialog):
+    window_title = 'Параметры склада'
+
     def __init__(self, node: Warehouse, sys: TransportSystem):
         super(WarehouseDialog, self).__init__(node, sys)
 
