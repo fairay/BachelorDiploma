@@ -1,9 +1,10 @@
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QSpacerItem, QSizePolicy
 
-from entities.geonode import GeoNode, Warehouse, Parking
-from ui.node_dialog import NodeDialog, WarehouseDialog, ParkingDialog
+from entities.geonode import GeoNode, Warehouse, Parking, Consumer
+from ui.node_dialog import NodeDialog, WarehouseDialog, ParkingDialog, ConsumerDialog
 from typing import Callable, Any, Type
+import ui.styles as st
 
 
 class ListField(QWidget):
@@ -12,6 +13,7 @@ class ListField(QWidget):
         self.node = node
         self.show_dialog = show_dialog
 
+        self.setProperty('class', 'list')
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
 
@@ -19,7 +21,7 @@ class ListField(QWidget):
         self.layout.addWidget(self.titleW)
 
         self.layout.addItem(QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum))
-        self.titleW.setStyleSheet(''' color: rgb(255, 0, 0); ''')
+        # self.titleW.setStyleSheet(''' color: rgb(255, 0, 0); ''')
 
     def mouseDoubleClickEvent(self, a0: QtGui.QMouseEvent) -> None:
         self.clickEvent()
@@ -38,7 +40,7 @@ class ListField(QWidget):
 class ParkingField(ListField):
     def __init__(self, node: Parking, show_dialog: Callable[[Type[NodeDialog], GeoNode], Any]):
         super(ParkingField, self).__init__(node, show_dialog)
-        self.titleW.setStyleSheet('color: rgb(200, 100, 0);')
+        self.titleW.setProperty('class', 'pTitle')
 
     def clickEvent(self):
         try:
@@ -50,10 +52,22 @@ class ParkingField(ListField):
 class WarehouseField(ListField):
     def __init__(self, node: Warehouse, show_dialog: Callable[[Type[NodeDialog], GeoNode], Any]):
         super(WarehouseField, self).__init__(node, show_dialog)
-        self.titleW.setStyleSheet('color: rgb(100, 150, 100);')
+        self.titleW.setProperty('class', 'wTitle')
 
     def clickEvent(self):
         try:
             self.show_dialog(WarehouseDialog, self.node)
+        except Exception as e:
+            print(e)
+
+
+class ConsumerField(ListField):
+    def __init__(self, node: Consumer, show_dialog: Callable[[Type[NodeDialog], GeoNode], Any]):
+        super(ConsumerField, self).__init__(node, show_dialog)
+        self.titleW.setProperty('class', 'cTitle')
+
+    def clickEvent(self):
+        try:
+            self.show_dialog(ConsumerDialog, self.node)
         except Exception as e:
             print(e)

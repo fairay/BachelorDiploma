@@ -11,16 +11,19 @@ from interface import *
 from graphics import get_figure
 from ui.node_dialog import NodeDialog
 
-from ui.node_list import WarehouseField, ListField, ParkingField
-
+from ui.node_list import WarehouseField, ListField, ParkingField, ConsumerField
+import ui.styles as st
 
 def init_system():
     tsys = TransportSystem()
 
     tsys.add_parking(Parking())
+
     tsys.add_warehouse(Warehouse({}, "Склад №1"))
     tsys.add_warehouse(Warehouse({}, "Склад №2"))
     tsys.add_warehouse(Warehouse({}, "Склад №3"))
+
+    tsys.add_consumer(Consumer({}, "Потребитель №1"))
 
     tsys.add_link(0, 1)
     tsys.add_link(1, 2)
@@ -80,12 +83,11 @@ class MainWin(QtWidgets.QMainWindow):
         if self.sys.parking:
             self.show_node(ParkingField(self.sys.parking, self.show_dialog))
 
-        for node in self.sys.warehouses:
-            self.show_node(WarehouseField(node, self.show_dialog))
+        for wnode in self.sys.warehouses:
+            self.show_node(WarehouseField(wnode, self.show_dialog))
 
-        for node in self.sys.consumers:
-            # self.show_node(ConsumerField(node, self.show_dialog))
-            pass
+        for cnode in self.sys.consumers:
+            self.show_node(ConsumerField(cnode, self.show_dialog))
 
     def show_dialog(self, dialog: Type[NodeDialog], node: GeoNode):
         form = dialog(node, self.sys)
@@ -101,6 +103,9 @@ def main():
     app = QtWidgets.QApplication([])
     application = MainWin()
     application.show()
+
+    app.setStyleSheet(st.stylesheet)
+    application.setStyleSheet(st.stylesheet)
 
     sys.exit(app.exec())
 

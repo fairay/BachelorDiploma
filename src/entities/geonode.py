@@ -69,6 +69,6 @@ class Parking(GeoNode):
 
 
 class Consumer(GeoNode):
-    def __init__(self, order: Dict[str, int]):
-        super().__init__()
+    def __init__(self, order: Dict[str, int], name='Потребитель'):
+        super().__init__(name)
         self.order = order
