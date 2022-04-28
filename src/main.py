@@ -24,11 +24,11 @@ def init_system():
 
     tsys.add_parking(init_parking())
 
-    tsys.add_warehouse(Warehouse({}, "Склад №1"))
-    tsys.add_warehouse(Warehouse({}, "Склад №2"))
-    tsys.add_warehouse(Warehouse({}, "Склад №3"))
+    tsys.add_warehouse(Warehouse([], "Склад №1"))
+    tsys.add_warehouse(Warehouse([], "Склад №2"))
+    tsys.add_warehouse(Warehouse([], "Склад №3"))
 
-    tsys.add_consumer(Consumer({}, "Потребитель №1"))
+    tsys.add_consumer(Consumer([], "Потребитель №1"))
 
     tsys.add_link(0, 1)
     tsys.add_link(1, 2)

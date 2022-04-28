@@ -59,10 +59,42 @@ class GeoNode(object):
             self.add_node(node, **data)
 
 
+class Product(object):
+    def __init__(self, name: str, amount: int):
+        self.name = name
+        self.amount = amount
+
+
 class Warehouse(GeoNode):
-    def __init__(self, stock: Dict[str, int], name=""):
+    def __init__(self, stock: List[Product], name=""):
         super().__init__(name)
         self.stock = stock
+
+    def __copy__(self) -> 'Warehouse':
+        new = Warehouse(self.stock, self.name)
+        new.linked = copy(self.linked)
+        new.stock = copy(self.stock)
+        return new
+
+    def del_product(self, product: Product):
+        for i, p in enumerate(self.stock):
+            if product.name == p.name:
+                del self.stock[i]
+
+    def add_product(self, new_product: Product):
+        for i, product in enumerate(self.stock):
+            if new_product.name == product.name:
+                self.stock[i] = new_product
+                return
+
+        self.stock.append(new_product)
+
+    def update(self, other: 'Warehouse'):
+        super(Warehouse, self).update(other)
+
+        self.stock = []
+        for product in other.stock:
+            self.add_product(product)
 
 
 class Parking(GeoNode):
@@ -76,6 +108,11 @@ class Parking(GeoNode):
         new.transport = copy(self.transport)
         return new
 
+    def del_transport(self, track: Transport):
+        for i, t in enumerate(self.transport):
+            if track.name == t.name:
+                del self.transport[i]
+
     def add_transport(self, track: Transport):
         for i, t in enumerate(self.transport):
             if track.name == t.name:
@@ -87,11 +124,12 @@ class Parking(GeoNode):
     def update(self, other: 'Parking'):
         super(Parking, self).update(other)
 
+        self.transport = []
         for track in other.transport:
             self.add_transport(track)
 
 
 class Consumer(GeoNode):
-    def __init__(self, order: Dict[str, int], name='Потребитель'):
+    def __init__(self, order: List[Product], name='Потребитель'):
         super().__init__(name)
         self.order = order

@@ -15,11 +15,13 @@ class ParkingDialog(NodeDialog):
         self.node: Parking = copy(node)
         self.source_node: Parking = node
 
-    def delete_track(self, link: TrackFiled):
+    def delete_track(self, filed: TrackFiled):
+        self.node.del_transport(filed.track)
+        
         for i in range(self.trackW.count()):
             item = self.trackW.item(i)
             widget = self.trackW.itemWidget(item)
-            if widget == link:
+            if widget == filed:
                 self.trackW.takeItem(i)
                 return
 
@@ -42,7 +44,6 @@ class ParkingDialog(NodeDialog):
             widget: TrackFiled = self.trackW.itemWidget(item)
 
             self.node.add_transport(widget.new_track)
-        print(self.node.transport)
 
     def track_UI(self):
         layout = QVBoxLayout()
