@@ -43,16 +43,19 @@ class TrackFiled(QWidget):
 
     @property
     def title(self) -> str: return self.titleW.text()
+
     @title.setter
     def title(self, value: str): self.titleW.setText(value)
 
     @property
     def volume(self) -> float: return self.volumeW.value()
+
     @volume.setter
     def volume(self, value: float): self.volumeW.setValue(value)
 
     @property
     def cons(self) -> float: return self.consW.value()
+
     @cons.setter
     def cons(self, value: float): self.consW.setValue(value)
 

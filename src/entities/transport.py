@@ -3,4 +3,3 @@ class Transport:
         self.name: str = name
         self.volume: float = volume
         self.cons: float = cons
-

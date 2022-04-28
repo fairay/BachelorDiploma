@@ -18,6 +18,7 @@ def init_parking() -> Parking:
     p.add_transport(Transport("Газель", 10, 10))
     return p
 
+
 def init_system():
     tsys = TransportSystem()
 
@@ -64,7 +65,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.update_list()
 
     def build_figure(self):
-        return 
+        return
         fig = get_figure()
         html = '<html><body>'
         html += plotly.offline.plot(fig, output_type='div', include_plotlyjs='cdn')
@@ -101,9 +102,6 @@ class MainWin(QtWidgets.QMainWindow):
 
 
 def main():
-    global app, application
-
-    init_system()
     app = QtWidgets.QApplication([])
     application = MainWin()
     application.show()

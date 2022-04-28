@@ -49,7 +49,6 @@ class LinkField(QWidget):
         self.editButton.setMaximumWidth(30)
         self.layout.addWidget(self.editButton)
 
-
     def initBinds(self):
         self.nodeW.currentIndexChanged.connect(self.indexChanged)
         self.editButton.clicked.connect(self.deleteEvent)
@@ -71,10 +70,12 @@ class LinkField(QWidget):
 
     @property
     def dist(self) -> float: return self.distW.value()
+
     @dist.setter
     def dist(self, value: float): self.distW.setValue(value)
 
     @property
     def time(self) -> float: return self.timeW.value()
+
     @time.setter
     def time(self, value: float): self.timeW.setValue(value)

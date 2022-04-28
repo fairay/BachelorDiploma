@@ -1,6 +1,7 @@
 import networkx as nx
 import plotly.graph_objs as go
 
+
 def get_figure():
     G = nx.random_geometric_graph(100, 0.125)
 
@@ -40,23 +41,23 @@ def get_figure():
     node_text = []
     for node, adjacencies in enumerate(G.adjacency()):
         node_adjacencies.append(len(adjacencies[1]))
-        node_text.append('# of connections: '+str(len(adjacencies[1])))
+        node_text.append('# of connections: ' + str(len(adjacencies[1])))
 
     node_trace.marker.color = node_adjacencies
     node_trace.text = node_text
 
     layout = go.Layout(
-                    title='Транспортный граф',
-                    titlefont_size=16,
-                    showlegend=False,
-                    hovermode='closest',
-                    margin=dict(b=20,l=5,r=5,t=40),
-                    annotations=[ dict(
-                        showarrow=False,
-                        xref="paper", yref="paper",
-                        x=0.005, y=-0.002)],
-                    xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+        title='Транспортный граф',
+        titlefont_size=16,
+        showlegend=False,
+        hovermode='closest',
+        margin=dict(b=20, l=5, r=5, t=40),
+        annotations=[dict(
+            showarrow=False,
+            xref="paper", yref="paper",
+            x=0.005, y=-0.002)],
+        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
 
     fig = go.Figure(data=[edge_trace, node_trace], layout=layout)
     # fig.show()
