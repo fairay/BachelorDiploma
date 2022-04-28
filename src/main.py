@@ -1,23 +1,27 @@
 import sys
 from typing import Type
 
+import plotly
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QListWidgetItem
-import plotly
 
-from entities.system import TransportSystem
-from entities.transport import *
-from interface import *
-from graphics import get_figure
-from ui.node_dialog import NodeDialog
-
-from ui.node_list import WarehouseField, ListField, ParkingField, ConsumerField
 import ui.styles as st
+from entities import *
+from graphics import get_figure
+from interface import *
+from ui.dialogs.node import NodeDialog
+from ui.node_list import WarehouseField, ListField, ParkingField, ConsumerField
+
+
+def init_parking() -> Parking:
+    p = Parking()
+    p.add_transport(Transport("Газель", 10, 10))
+    return p
 
 def init_system():
     tsys = TransportSystem()
 
-    tsys.add_parking(Parking())
+    tsys.add_parking(init_parking())
 
     tsys.add_warehouse(Warehouse({}, "Склад №1"))
     tsys.add_warehouse(Warehouse({}, "Склад №2"))

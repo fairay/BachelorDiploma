@@ -1,10 +1,13 @@
+from typing import Callable, Any, Type
+
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QSpacerItem, QSizePolicy
 
 from entities.geonode import GeoNode, Warehouse, Parking, Consumer
-from ui.node_dialog import NodeDialog, WarehouseDialog, ParkingDialog, ConsumerDialog
-from typing import Callable, Any, Type
-import ui.styles as st
+from ui.dialogs.consumer import ConsumerDialog
+from ui.dialogs.node import NodeDialog
+from ui.dialogs.parking import ParkingDialog
+from ui.dialogs.warehouse import WarehouseDialog
 
 
 class ListField(QWidget):

@@ -1,14 +1,6 @@
-from .geonode import *
-
-
 class Transport:
-    def __init__(self):
-        self.volume: float = 0
-        self.cons: float = 0
-
-
-class Route:
-    def __init__(self, parking: Parking):
-        self.nodes: List[GeoNode] = [parking]
-
+    def __init__(self, name="", volume=0.0, cons=0.0):
+        self.name: str = name
+        self.volume: float = volume
+        self.cons: float = cons
 

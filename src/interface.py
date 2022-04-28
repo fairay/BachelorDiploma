@@ -1,11 +1,6 @@
-from ast import Expression, match_case
-import re
-from webbrowser import GenericBrowser
-
-from numpy import delete
-from ui.gui import *
-
 from PyQt5.QtCore import Qt
+
+from ui.gui import *
 
 
 class GuiMainWin(Ui_MainWindow):

@@ -1,7 +1,8 @@
 from typing import List, Optional
 
+from entities import Route
 from entities.geonode import Parking, Warehouse, Consumer, GeoNode
-from entities.transport import Transport, Route
+from entities.transport import Transport
 
 
 class TransportSystem:

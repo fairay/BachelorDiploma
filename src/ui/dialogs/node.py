@@ -1,11 +1,12 @@
+from copy import copy
+
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QHBoxLayout, QSpacerItem, QSizePolicy, QVBoxLayout, QLineEdit, QPushButton, \
     QListWidgetItem, QListWidget, QMessageBox
 
-from entities.geonode import *
-from entities.system import TransportSystem
-from ui.fields import LinkField
+from entities import *
+from ui.fields import *
 
 
 class NodeDialog(QDialog):
@@ -61,11 +62,13 @@ class NodeDialog(QDialog):
         return layout
 
     def buttons_UI(self):
-        layout = QVBoxLayout()
+        layout = QHBoxLayout()
 
         applyW = QPushButton("Применить", self)
         applyW.clicked.connect(self.apply)
         layout.addWidget(applyW)
+
+        layout.addItem(QSpacerItem(10, 0, QSizePolicy.Fixed, QSizePolicy.Fixed))
 
         deleteW = QPushButton("Удалить", self)
         deleteW.clicked.connect(self.delete)
@@ -153,35 +156,3 @@ class NodeDialog(QDialog):
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         pass
         # self.node = self.source_node
-
-
-class ParkingDialog(NodeDialog):
-    window_title = 'Параметры стоянки'
-
-    def __init__(self, node: Warehouse, sys: TransportSystem):
-        super(ParkingDialog, self).__init__(node, sys)
-
-    def additional_UI(self):
-        apply_btn = QPushButton("Something for Parking", self)
-        self.content.addWidget(apply_btn)
-
-
-class WarehouseDialog(NodeDialog):
-    window_title = 'Параметры склада'
-
-    def __init__(self, node: Warehouse, sys: TransportSystem):
-        super(WarehouseDialog, self).__init__(node, sys)
-
-    def additional_UI(self):
-        apply_btn = QPushButton("Something for Warehouse", self)
-        self.content.addWidget(apply_btn)
-
-class ConsumerDialog(NodeDialog):
-    window_title = 'Параметры потребителя'
-
-    def __init__(self, node: Warehouse, sys: TransportSystem):
-        super(ConsumerDialog, self).__init__(node, sys)
-
-    def additional_UI(self):
-        apply_btn = QPushButton("Something for Consumer", self)
-        self.content.addWidget(apply_btn)

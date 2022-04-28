@@ -16,7 +16,13 @@ QMainWindow {{
     background-color: {colors['bg']};
 }}
 
-QWidget.list  {{
+QPushButton {{
+    border: 1px solid {colors['accent3']};
+    border-radius: 10px;
+    height: 35px
+}}
+
+QPushButton:hover {{
     background-color: {colors['bgAlt']};
 }}
 
@@ -27,6 +33,18 @@ QListWidget {{
 }}
 
 QListWidget::item:selected QListWidget::item:hover {{
+    background-color: {colors['bgAlt']};
+}}
+
+QComboBox {{
+    color: {colors['text']};
+    padding-left: 10px;
+    border: 1px solid {colors['accent3']};
+    border-radius: 10px;
+    background-color: transparent;
+}}
+
+QWidget.list  {{
     background-color: {colors['bgAlt']};
 }}
 

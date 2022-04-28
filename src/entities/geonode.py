@@ -1,6 +1,8 @@
 from copy import copy
 from typing import *
 
+from .transport import Transport
+
 
 class GeoNode(object):
     def __init__(self, name=""):
@@ -19,7 +21,7 @@ class GeoNode(object):
     def __hash__(self):
         return id(self)
 
-    def __copy__(self):
+    def __copy__(self) -> 'GeoNode':
         new = GeoNode(self.name)
         new.linked = copy(self.linked)
         return new
@@ -66,6 +68,27 @@ class Warehouse(GeoNode):
 class Parking(GeoNode):
     def __init__(self, name='Стоянка'):
         super(Parking, self).__init__(name)
+        self.transport: List[Transport] = []
+
+    def __copy__(self) -> 'Parking':
+        new = Parking(self.name)
+        new.linked = copy(self.linked)
+        new.transport = copy(self.transport)
+        return new
+
+    def add_transport(self, track: Transport):
+        for i, t in enumerate(self.transport):
+            if track.name == t.name:
+                self.transport[i] = track
+                return
+
+        self.transport.append(track)
+
+    def update(self, other: 'Parking'):
+        super(Parking, self).update(other)
+
+        for track in other.transport:
+            self.add_transport(track)
 
 
 class Consumer(GeoNode):

@@ -47,14 +47,12 @@ class LinkField(QWidget):
 
         self.editButton = QPushButton("🗑️")
         self.editButton.setMaximumWidth(30)
-        self.editButton.clicked.connect(self.clickEvent)
         self.layout.addWidget(self.editButton)
 
-        # setStyleSheet
-        self.nodeW.setStyleSheet('color: rgb(255, 0, 0);')
 
     def initBinds(self):
         self.nodeW.currentIndexChanged.connect(self.indexChanged)
+        self.editButton.clicked.connect(self.deleteEvent)
 
     def indexChanged(self, index: int):
         self.node = self.options[index]
@@ -65,7 +63,7 @@ class LinkField(QWidget):
     def setTextDown(self, text):
         self.node_widget.setText(text)
 
-    def clickEvent(self):
+    def deleteEvent(self):
         self.dialog.delete_link(self)
 
     def closeEvent(self, event):

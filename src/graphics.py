@@ -1,4 +1,3 @@
-import networkx
 import networkx as nx
 import plotly.graph_objs as go
 
