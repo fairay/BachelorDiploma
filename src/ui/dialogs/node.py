@@ -84,7 +84,7 @@ class NodeDialog(QDialog):
         if name == "":
             raise Exception("Имя не задано")
 
-        nodes = list(filter(lambda n: n.name == name, self.sys.node_arr))
+        nodes = list(filter(lambda n: n.name == name, self.sys.nodes))
         if len(nodes) > 0 and nodes != [self.source_node]:
             raise Exception("Имя пункта уже занято")
 
@@ -116,10 +116,12 @@ class NodeDialog(QDialog):
         print('Applied')
 
     def delete(self):
-        pass
+        del self.sys[self.source_node]
+        self.close()
+        print('Deleted')
 
     def add_new_link(self):
-        node_list = self.sys.node_arr
+        node_list = self.sys.nodes
         node_list.remove(self.source_node)
 
         for i in range(self.linkW.count()):
@@ -132,7 +134,7 @@ class NodeDialog(QDialog):
             self.add_link(node_list[0])
 
     def add_link(self, other: GeoNode):
-        node_list = self.sys.node_arr
+        node_list = self.sys.nodes
         node_list.remove(self.source_node)
         widget = LinkField(self, other, node_list)
 
@@ -145,11 +147,11 @@ class NodeDialog(QDialog):
         for other in self.node.linked.keys():
             self.add_link(other)
 
-    def delete_link(self, link: LinkField):
+    def delete_link(self, del_link: LinkField):
         for i in range(self.linkW.count()):
             item = self.linkW.item(i)
             widget = self.linkW.itemWidget(item)
-            if widget == link:
+            if widget == del_link:
                 self.linkW.takeItem(i)
                 return
 

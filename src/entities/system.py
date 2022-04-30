@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from entities import Route
 from entities.geonode import Parking, Warehouse, Consumer, GeoNode
@@ -30,17 +30,17 @@ class TransportSystem:
         self.transport.append(truck)
 
     def add_link(self, ind1: int, ind2: int, dist=1.0, time=1.0):
-        if max(ind1, ind2) >= len(self.node_arr) or min(ind1, ind2) < 0 or ind1 == ind2:
+        if max(ind1, ind2) >= len(self.nodes) or min(ind1, ind2) < 0 or ind1 == ind2:
             raise Exception('Wrong index')
 
-        obj1 = self.node_arr[ind1]
-        obj2 = self.node_arr[ind2]
+        obj1 = self.nodes[ind1]
+        obj2 = self.nodes[ind2]
         obj1.add_node(obj2, dist, time)
 
     def unlinked(self, node: GeoNode):
         return list(filter(
             lambda other: not (node.is_linked(other) or node == other),
-            self.node_arr
+            self.nodes
         ))
 
     def calc_routes(self):
@@ -60,4 +60,26 @@ class TransportSystem:
         res += self.consumers
         return res
 
-    node_arr = property(_get_nodes)
+    def del_node(self, key: GeoNode):
+        if key == self.parking:
+            self.parking = None
+        elif key in self.consumers:
+            key: Consumer
+            self.consumers.remove(key)
+        elif key in self.warehouses:
+            key: Warehouse
+            self.warehouses.remove(key)
+        else:
+            raise Exception('No such node')
+
+        key.unlink()
+
+    def __delitem__(self, key: Union[GeoNode, int]):
+        if isinstance(key, GeoNode):
+            self.del_node(key)
+        elif isinstance(key, int):
+            self.del_node(self.nodes[key])
+        else:
+            raise Exception('Unexpected type')
+
+    nodes = property(_get_nodes)
