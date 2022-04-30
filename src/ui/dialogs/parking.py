@@ -17,7 +17,7 @@ class ParkingDialog(NodeDialog):
 
     def delete_track(self, filed: TrackFiled):
         self.node.del_transport(filed.track)
-        
+
         for i in range(self.trackW.count()):
             item = self.trackW.item(i)
             widget = self.trackW.itemWidget(item)
