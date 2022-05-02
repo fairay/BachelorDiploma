@@ -1,14 +1,14 @@
 import sys
-from typing import Type
+from typing import Type, Optional
 
-import plotly
-from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QListWidgetItem
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 
 import ui.styles as st
 from entities import *
 from graphics import get_figure
 from interface import *
+from interface import GuiMainWin
 from ui.dialogs.node import NodeDialog
 from ui.node_list import WarehouseField, ListField, ParkingField, ConsumerField
 
@@ -32,6 +32,8 @@ def init_system():
     tsys.add_consumer(c)
 
     tsys.add_link(0, 1)
+    tsys.add_link(0, 2)
+    tsys.add_link(0, 3)
     tsys.add_link(1, 2)
     tsys.add_link(4, 3)
 
@@ -52,29 +54,28 @@ def init_system():
 
 
 class MainWin(QtWidgets.QMainWindow):
-    ui = None
+    ui: GuiMainWin = None
 
     def __init__(self):
         super().__init__()
         self.ui = GuiMainWin()
         self.ui.setupUi(self)
+        self.canvas: Optional[FigureCanvasQTAgg] = None
 
         self.sys = init_system()
 
         self.setAnimated(True)
         self.setUpdatesEnabled(True)
         self.build_figure()
-        self.update_list()
+        self.render_ui()
 
     def build_figure(self):
-        return
-        fig = get_figure()
-        html = '<html><body>'
-        html += plotly.offline.plot(fig, output_type='div', include_plotlyjs='cdn')
-        html += '</body></html>'
-        plot_widget = QWebEngineView()
-        plot_widget.setHtml(html)
-        self.ui.GraphWidget.addWidget(plot_widget)
+        fig = get_figure(self.sys)
+        
+        if self.canvas:
+            self.ui.GraphWidget.removeWidget(self.canvas)
+        self.canvas = FigureCanvasQTAgg(fig)
+        self.ui.GraphWidget.addWidget(self.canvas)
 
     def clean_list(self):
         self.ui.NodeList.clear()
@@ -85,7 +86,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.ui.NodeList.addItem(item)
         self.ui.NodeList.setItemWidget(item, widget)
 
-    def update_list(self):
+    def render_ui(self):
         self.clean_list()
         if self.sys.parking:
             self.show_node(ParkingField(self.sys.parking, self.show_dialog))
@@ -96,11 +97,13 @@ class MainWin(QtWidgets.QMainWindow):
         for cnode in self.sys.consumers:
             self.show_node(ConsumerField(cnode, self.show_dialog))
 
+        self.build_figure()
+
     def show_dialog(self, dialog: Type[NodeDialog], node: GeoNode):
         form = dialog(node, self.sys)
-        form.exec_()
-
-        self.update_list()
+        code = form.exec_()
+        if code:
+            self.render_ui()
 
 
 def main():

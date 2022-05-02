@@ -112,11 +112,14 @@ class NodeDialog(QDialog):
             return
 
         self.source_node.update(self.node)
+        self.setResult(1)
         self.close()
         print('Applied')
 
     def delete(self):
         del self.sys[self.source_node]
+
+        self.setResult(1)
         self.close()
         print('Deleted')
 

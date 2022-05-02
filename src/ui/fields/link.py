@@ -37,12 +37,14 @@ class LinkField(QWidget):
         self.distW = QDoubleSpinBox()
         self.distW.setValue(dist)
         self.distW.setFrame(0)
+        self.distW.setToolTip('Расстояние')
         self.layout.addWidget(self.distW)
 
         time = self.parent().node.time(self.node) if self.parent().node.is_linked(self.node) else 1.0
         self.timeW = QDoubleSpinBox()
         self.timeW.setValue(time)
         self.timeW.setFrame(0)
+        self.timeW.setToolTip('Время')
         self.layout.addWidget(self.timeW)
 
         self.editButton = QPushButton("🗑️")
