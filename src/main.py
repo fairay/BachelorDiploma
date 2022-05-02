@@ -71,7 +71,7 @@ class MainWin(QtWidgets.QMainWindow):
 
     def build_figure(self):
         fig = get_figure(self.sys)
-        
+
         if self.canvas:
             self.ui.GraphWidget.removeWidget(self.canvas)
         self.canvas = FigureCanvasQTAgg(fig)

@@ -1,7 +1,7 @@
 from typing import List, Optional, Union
 
-from entities import Route
 from entities.geonode import Parking, Warehouse, Consumer, GeoNode
+from entities.road import Road
 from entities.transport import Transport
 
 
@@ -35,7 +35,7 @@ class TransportSystem:
 
         obj1 = self.nodes[ind1]
         obj2 = self.nodes[ind2]
-        obj1.add_node(obj2, dist, time)
+        obj1.add_node(obj2, Road(dist, time))
 
     def unlinked(self, node: GeoNode):
         return list(filter(

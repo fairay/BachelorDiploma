@@ -98,11 +98,11 @@ class NodeDialog(QDialog):
             if widget.node in new_dict:
                 raise Exception("Несколько связей с %s" % str(widget.node))
 
-            new_dict[widget.node] = {'dist': widget.dist, 'time': widget.time}
+            new_dict[widget.node] = Road(widget.dist, widget.time)
 
         self.node.unlink()
-        for k, v in new_dict.items():
-            self.node.add_node(k, **v, symmetric=False)
+        for other, road in new_dict.items():
+            self.node.add_node(other, road, symmetric=False)
 
     def apply(self):
         try:

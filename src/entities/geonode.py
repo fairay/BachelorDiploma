@@ -1,13 +1,14 @@
 from copy import copy
 from typing import *
 
+from .road import Road
 from .transport import Transport
 
 
 class GeoNode(object):
     def __init__(self, name=""):
         self.name: str = name
-        self.linked: Dict[GeoNode, Dict[str, float]] = {}
+        self.linked: Dict[GeoNode, Road] = {}
 
     def __str__(self):
         return self.name
@@ -27,22 +28,22 @@ class GeoNode(object):
         return new
 
     def dist(self, other: 'GeoNode'):
-        return self.linked[other]['dist'] if self.is_linked(other) else None
+        return self.linked[other].dist if self.is_linked(other) else None
 
     def time(self, other: 'GeoNode'):
-        return self.linked[other]['time'] if self.is_linked(other) else None
+        return self.linked[other].time if self.is_linked(other) else None
 
-    def add_node(self, other: 'GeoNode', dist=1.0, time=1.0, symmetric=True):
-        self.linked[other] = {'dist': dist, 'time': time}
+    def add_node(self, other: 'GeoNode', road: Road, symmetric=True):
+        self.linked[other] = road
         if symmetric:
-            other.linked[self] = {'dist': dist, 'time': time}
+            other.add_node(self, road, symmetric=False)
 
     def delete_node(self, other: 'GeoNode', symmetric=True):
         if not self.is_linked(other):
             return
         self.linked.pop(other)
         if symmetric:
-            other.delete_node(self, False)
+            other.delete_node(self, symmetric=False)
 
     def unlink(self):
         keys = self.linked.keys()
@@ -55,8 +56,8 @@ class GeoNode(object):
     def update(self, other: 'GeoNode'):
         self.name = other.name
         self.unlink()
-        for node, data in other.linked.items():
-            self.add_node(node, **data)
+        for node, road in other.linked.items():
+            self.add_node(node, road)
 
 
 class Product(object):
