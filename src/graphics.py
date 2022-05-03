@@ -7,9 +7,9 @@ from entities import TransportSystem
 def build_graph(sys: TransportSystem) -> nx.Graph:
     g = nx.Graph()
     for node in sys.nodes:
-        g.add_node(node, name=node.name)
+        g.add_node(node.name)
         for other, road in node.linked.items():
-            g.add_edge(node, other, weight=1 / road.dist, **road.__dict__)
+            g.add_edge(node.name, other.name, weight=1 / road.dist, **road.__dict__)
 
     return g
 
