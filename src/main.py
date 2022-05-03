@@ -1,12 +1,11 @@
 import sys
 from typing import Type, Optional
 
-from PyQt5.QtWidgets import QListWidgetItem
+from PyQt5.QtWidgets import QListWidgetItem, QFileDialog
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 
 import ui.styles as st
 from entities import *
-from entities.route_builder import RouteBuilder
 from graphics import get_figure
 from interface import *
 from interface import GuiMainWin
@@ -29,7 +28,7 @@ def init_system():
     tsys.add_warehouse(Warehouse([Product('кола', 10)], "Склад №2"))
     tsys.add_warehouse(Warehouse([Product('кола', 10), Product('шоколад', 20)], "Склад №3"))
 
-    c = Consumer([Product('кола', 15), Product('шоколад', 35)], "Потребитель №1")
+    c = Consumer([Product('кола', 15), Product('шоколад', 25)], "Потребитель №1")
     tsys.add_consumer(c)
 
     tsys.add_link(0, 1)
@@ -43,19 +42,67 @@ def init_system():
 
 class MainWin(QtWidgets.QMainWindow):
     ui: GuiMainWin = None
+    window_title = 'Оптимизация маршрутов поставок'
 
-    def __init__(self, sys: TransportSystem):
+    sys: TransportSystem
+    sys_file: str
+    unsaved: bool
+
+    def __init__(self, sys_file="configs/data.json", sys: TransportSystem = None):
         super().__init__()
         self.ui = GuiMainWin()
         self.ui.setupUi(self)
         self.canvas: Optional[FigureCanvasQTAgg] = None
 
-        self.sys = sys
+        self.sys_file = sys_file
+        self.unsaved = False
+        if sys:
+            self.sys = sys
+        else:
+            self.import_sys(sys_file)
 
         self.setAnimated(True)
         self.setUpdatesEnabled(True)
         self.build_figure()
         self.render_ui()
+        self.set_binds()
+
+    def set_binds(self):
+        self.ui.import_action.triggered.connect(self.import_action)
+        self.ui.export_action.triggered.connect(self.export_action)
+
+    def import_action(self):
+        try:
+            file_name = QFileDialog.getOpenFileName(self, 'Выберите конфигурационный файл', './configs/')[0]
+            if file_name == '':
+                return
+            self.import_sys(file_name)
+
+        except Exception as e:
+            self.ui.err_msg(str(e))
+        self.render_ui()
+
+    def import_sys(self, file_name: str):
+        with open(file_name, 'r', encoding='utf-8') as f:
+            self.sys = TransportSystem.load_json(f)
+        self.sys_file = file_name
+
+    def export_action(self):
+        try:
+            file_name = QFileDialog.getSaveFileName(self, 'Выберите конфигурационный файл', './configs/')[0]
+            if file_name == '':
+                return
+            self.export_sys(file_name)
+        except Exception as e:
+            self.ui.err_msg(str(e))
+
+        self.render_ui()
+
+    def export_sys(self, file_name: str):
+        with open(file_name, 'w', encoding='utf-8') as f:
+            self.sys.save_json(f)
+        self.unsaved = False
+        self.sys_file = file_name
 
     def build_figure(self):
         fig = get_figure(self.sys)
@@ -87,16 +134,19 @@ class MainWin(QtWidgets.QMainWindow):
 
         self.build_figure()
 
+        self.setWindowTitle(f'{self.window_title} ({self.sys_file}{" *" if self.unsaved else ""})')
+
     def show_dialog(self, dialog: Type[NodeDialog], node: GeoNode):
         form = dialog(node, self.sys)
         code = form.exec_()
         if code:
+            self.unsaved = True
             self.render_ui()
 
 
 def main():
     app = QtWidgets.QApplication([])
-    application = MainWin(init_system())
+    application = MainWin()
     application.show()
 
     app.setStyleSheet(st.stylesheet)
@@ -106,6 +156,4 @@ def main():
 
 
 if __name__ == '__main__':
-    sys = init_system()
-    builder = RouteBuilder(sys)
     main()

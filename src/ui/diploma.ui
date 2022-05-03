@@ -65,7 +65,7 @@
                     <x>0</x>
                     <y>0</y>
                     <width>1075</width>
-                    <height>30</height>
+                    <height>22</height>
                 </rect>
             </property>
             <widget class="QMenu" name="menu">
@@ -88,25 +88,8 @@
                 <property name="title">
                     <string>Файл</string>
                 </property>
-                <widget class="QMenu" name="menu_5">
-                    <property name="title">
-                        <string>Экспорт</string>
-                    </property>
-                    <addaction name="action_4"/>
-                    <addaction name="action_5"/>
-                    <addaction name="action_6"/>
-                </widget>
-                <widget class="QMenu" name="menu_6">
-                    <property name="title">
-                        <string>Импорт</string>
-                    </property>
-                    <addaction name="action_8"/>
-                    <addaction name="action_9"/>
-                    <addaction name="action_10"/>
-                </widget>
-                <addaction name="menu_5"/>
-                <addaction name="separator"/>
-                <addaction name="menu_6"/>
+                <addaction name="import_action"/>
+                <addaction name="export_action"/>
             </widget>
             <widget class="QMenu" name="menu_7">
                 <property name="title">
@@ -159,6 +142,16 @@
         <action name="action_11">
             <property name="text">
                 <string>Добавить</string>
+            </property>
+        </action>
+        <action name="import_action">
+            <property name="text">
+                <string>Импорт</string>
+            </property>
+        </action>
+        <action name="export_action">
+            <property name="text">
+                <string>Экспорт</string>
             </property>
         </action>
     </widget>

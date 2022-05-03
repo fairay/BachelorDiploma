@@ -15,12 +15,12 @@ class GuiMainWin(Ui_MainWindow):
     def set_binds(self):
         pass
 
-    def err_msg(self, text):
+    def err_msg(self, text: str):
         msg = QtWidgets.QMessageBox()
         msg.setIcon(QtWidgets.QMessageBox.Warning)
         msg.setText(
             "<html><head/><body><p><span style=\" font-size:14pt;\">"
-            "{:}"
-            " </span></p></body></html>".format(text))
+            f"{text}"
+            " </span></p></body></html>")
         msg.setWindowTitle("Ошибка")
         msg.exec_()

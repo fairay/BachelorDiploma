@@ -1,4 +1,6 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Union, TextIO
+
+import jsonpickle
 
 from entities.geonode import Parking, Warehouse, Consumer, GeoNode
 from entities.road import Road
@@ -17,6 +19,20 @@ class TransportSystem(object):
 
         self.vol: float = 1.0
         self.con: float = 1.0
+
+    def save_json(self, file: TextIO):
+        jsonpickle.set_preferred_backend('json')
+        jsonpickle.set_encoder_options('json', ensure_ascii=False)
+        json_str = jsonpickle.encode(self, indent=4, keys=True)
+        file.write(json_str)
+
+    @staticmethod
+    def load_json(file: TextIO) -> 'TransportSystem':
+        jsonpickle.set_preferred_backend('json')
+        jsonpickle.set_encoder_options('json', ensure_ascii=False)
+        data = jsonpickle.decode(file.read(), keys=True)
+
+        return data
 
     def add_warehouse(self, node: Warehouse):
         self.warehouses.append(node)
