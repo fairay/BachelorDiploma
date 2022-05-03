@@ -1,9 +1,10 @@
 import sys
 from typing import Type, Optional
 
+import PyQt5.QtWidgets
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QListWidgetItem, QFileDialog, QShortcut
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
 
 import ui.styles as st
 from entities import *
@@ -49,17 +50,18 @@ class MainWin(QtWidgets.QMainWindow):
     sys_file: str
     unsaved: bool
 
-    def __init__(self, sys_file="configs/data.json", sys: TransportSystem = None):
+    def __init__(self, sys_file="configs/data.json", tsys: TransportSystem = None):
         super().__init__()
         self.ui = GuiMainWin()
         self.ui.setupUi(self)
         self.canvas: Optional[FigureCanvasQTAgg] = None
+        self.navbar: Optional[NavigationToolbar2QT] = None
         QShortcut(QKeySequence("Ctrl+S"), self).activated.connect(self.export_click)
 
         self.sys_file = sys_file
         self.unsaved = False
-        if sys:
-            self.sys = sys
+        if tsys:
+            self.sys = tsys
         else:
             self.import_sys(sys_file)
 
@@ -118,8 +120,15 @@ class MainWin(QtWidgets.QMainWindow):
 
         if self.canvas:
             self.ui.GraphWidget.removeWidget(self.canvas)
+        if self.navbar:
+            self.ui.GraphWidget.removeWidget(self.navbar)
+
         self.canvas = FigureCanvasQTAgg(fig)
+        self.navbar = NavigationToolbar2QT(self.canvas, self, coordinates=False)
+        self.navbar.setSizePolicy(PyQt5.QtWidgets.QSizePolicy.Expanding, PyQt5.QtWidgets.QSizePolicy.Fixed)
+
         self.ui.GraphWidget.addWidget(self.canvas)
+        self.ui.GraphWidget.addWidget(self.navbar)
 
     def clean_list(self):
         self.ui.NodeList.clear()
