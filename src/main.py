@@ -1,7 +1,8 @@
 import sys
 from typing import Type, Optional
 
-from PyQt5.QtWidgets import QListWidgetItem, QFileDialog
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QListWidgetItem, QFileDialog, QShortcut
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 
 import ui.styles as st
@@ -53,6 +54,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.ui = GuiMainWin()
         self.ui.setupUi(self)
         self.canvas: Optional[FigureCanvasQTAgg] = None
+        QShortcut(QKeySequence("Ctrl+S"), self).activated.connect(self.export_click)
 
         self.sys_file = sys_file
         self.unsaved = False
@@ -96,6 +98,13 @@ class MainWin(QtWidgets.QMainWindow):
         except Exception as e:
             self.ui.err_msg(str(e))
 
+        self.render_ui()
+
+    def export_click(self):
+        if not self.unsaved:
+            return
+
+        self.export_sys(self.sys_file)
         self.render_ui()
 
     def export_sys(self, file_name: str):

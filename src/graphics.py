@@ -16,7 +16,7 @@ def build_graph(sys: TransportSystem) -> nx.Graph:
 
 def get_figure(sys: TransportSystem) -> plt.Figure:
     g = build_graph(sys)
-    pos = nx.spring_layout(g, scale=1.0)
+    pos = nx.spring_layout(g, scale=1.0, seed=10)
 
     fig: plt.Figure = plt.figure()
     subp = fig.add_subplot(111)
