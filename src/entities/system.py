@@ -2,10 +2,11 @@ from typing import List, Optional, Union
 
 from entities.geonode import Parking, Warehouse, Consumer, GeoNode
 from entities.road import Road
+from entities.route import Route
 from entities.transport import Transport
 
 
-class TransportSystem:
+class TransportSystem(object):
     def __init__(self):
         self.transport: List[Transport] = []
         self.routes: List[Route] = []
@@ -42,17 +43,6 @@ class TransportSystem:
             lambda other: not (node.is_linked(other) or node == other),
             self.nodes
         ))
-
-    def calc_routes(self):
-        self._init_routes()
-        self._main_routes()
-
-    def _init_routes(self):
-        path_len = []
-        # for node in self.warehouses:
-
-    def _main_routes(self):
-        pass
 
     def _get_nodes(self) -> List[GeoNode]:
         res = [self.parking] if self.parking is not None else []

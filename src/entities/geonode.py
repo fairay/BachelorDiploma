@@ -61,9 +61,21 @@ class GeoNode(object):
 
 
 class Product(object):
+    __match_args__ = ('name',)
+
     def __init__(self, name: str, amount: int):
         self.name = name
         self.amount = amount
+
+    def __iadd__(self, other: Union['Product', int]):
+        match other:
+            case Product(name) if name == self.name:
+                self.amount += other.amount
+            case int():
+                self.amount += other
+            case _:
+                raise Exception('Wrong type for addition')
+        return self
 
 
 class Warehouse(GeoNode):

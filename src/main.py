@@ -6,6 +6,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 
 import ui.styles as st
 from entities import *
+from entities.route_builder import RouteBuilder
 from graphics import get_figure
 from interface import *
 from interface import GuiMainWin
@@ -24,11 +25,11 @@ def init_system():
 
     tsys.add_parking(init_parking())
 
-    tsys.add_warehouse(Warehouse([], "Склад №1"))
-    tsys.add_warehouse(Warehouse([], "Склад №2"))
-    tsys.add_warehouse(Warehouse([], "Склад №3"))
+    tsys.add_warehouse(Warehouse([Product('шоколад', 10)], "Склад №1"))
+    tsys.add_warehouse(Warehouse([Product('кола', 10)], "Склад №2"))
+    tsys.add_warehouse(Warehouse([Product('кола', 10), Product('шоколад', 20)], "Склад №3"))
 
-    c = Consumer([], "Потребитель №1")
+    c = Consumer([Product('кола', 15), Product('шоколад', 35)], "Потребитель №1")
     tsys.add_consumer(c)
 
     tsys.add_link(0, 1)
@@ -39,30 +40,17 @@ def init_system():
 
     return tsys
 
-    # p = Parking()
-    # trans.add_parking(p)
-    #
-    # ware = [Warehouse({'Сникерс': 40, 'Хлеб': 10})]
-    # p.add_node(ware[0], 2.4, 5.0)
-    # trans.add_warehouse(ware[0])
-    #
-    # cons = [Consumer({'Сникерс': 20}), Consumer({'Сникерс': 10, 'Хлеб': 5})]
-    # ware[0].add_node(cons[0], 5.0, 15.0)
-    # ware[0].add_node(cons[1], 7.0, 20.0)
-    # trans.add_consumer(cons[0])
-    # trans.add_consumer(cons[1])
-
 
 class MainWin(QtWidgets.QMainWindow):
     ui: GuiMainWin = None
 
-    def __init__(self):
+    def __init__(self, sys: TransportSystem):
         super().__init__()
         self.ui = GuiMainWin()
         self.ui.setupUi(self)
         self.canvas: Optional[FigureCanvasQTAgg] = None
 
-        self.sys = init_system()
+        self.sys = sys
 
         self.setAnimated(True)
         self.setUpdatesEnabled(True)
@@ -108,7 +96,7 @@ class MainWin(QtWidgets.QMainWindow):
 
 def main():
     app = QtWidgets.QApplication([])
-    application = MainWin()
+    application = MainWin(init_system())
     application.show()
 
     app.setStyleSheet(st.stylesheet)
@@ -118,4 +106,6 @@ def main():
 
 
 if __name__ == '__main__':
+    sys = init_system()
+    builder = RouteBuilder(sys)
     main()
