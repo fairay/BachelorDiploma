@@ -1,16 +1,17 @@
 import sys
-from typing import Type, Optional
+from typing import Type
 
-import PyQt5.QtWidgets
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QListWidgetItem, QFileDialog, QShortcut
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 
 import ui.styles as st
 from entities import *
 from graphics import get_figure
 from interface import *
 from interface import GuiMainWin
+from ui.dialogs import ParkingDialog, WarehouseDialog, ConsumerDialog
 from ui.dialogs.node import NodeDialog
 from ui.node_list import WarehouseField, ListField, ParkingField, ConsumerField
 
@@ -54,9 +55,7 @@ class MainWin(QtWidgets.QMainWindow):
         super().__init__()
         self.ui = GuiMainWin()
         self.ui.setupUi(self)
-        self.canvas: Optional[FigureCanvasQTAgg] = None
-        self.navbar: Optional[NavigationToolbar2QT] = None
-        QShortcut(QKeySequence("Ctrl+S"), self).activated.connect(self.export_click)
+        self.showMaximized()
 
         self.sys_file = sys_file
         self.unsaved = False
@@ -65,15 +64,45 @@ class MainWin(QtWidgets.QMainWindow):
         else:
             self.import_sys(sys_file)
 
-        self.setAnimated(True)
-        self.setUpdatesEnabled(True)
-        self.build_figure()
         self.render_ui()
         self.set_binds()
 
     def set_binds(self):
+        QShortcut(QKeySequence("Ctrl+S"), self).activated.connect(self.export_click)
         self.ui.import_action.triggered.connect(self.import_action)
         self.ui.export_action.triggered.connect(self.export_action)
+
+        self.ui.action_parking.triggered.connect(self.action_parking)
+        self.ui.action_warehouse.triggered.connect(self.action_warehouse)
+        self.ui.action_consumer.triggered.connect(self.action_consumer)
+
+    def action_parking(self):
+        if self.sys.parking:
+            self.ui.err_msg("Стоянка уже существует")
+            return
+
+        node = Parking()
+        self.sys.add_parking(node)
+        self.unsaved = True
+
+        self.render_ui()
+        self.show_dialog(ParkingDialog, node)
+
+    def action_warehouse(self):
+        node = Warehouse([])
+        self.sys.add_warehouse(node)
+        self.unsaved = True
+
+        self.render_ui()
+        self.show_dialog(WarehouseDialog, node)
+
+    def action_consumer(self):
+        node = Consumer([])
+        self.sys.add_consumer(node)
+        self.unsaved = True
+
+        self.render_ui()
+        self.show_dialog(ConsumerDialog, node)
 
     def import_action(self):
         try:
@@ -117,18 +146,18 @@ class MainWin(QtWidgets.QMainWindow):
 
     def build_figure(self):
         fig = get_figure(self.sys)
+        g_layout = self.ui.GraphWidget
 
-        if self.canvas:
-            self.ui.GraphWidget.removeWidget(self.canvas)
-        if self.navbar:
-            self.ui.GraphWidget.removeWidget(self.navbar)
+        while g_layout.count():
+            item = g_layout.itemAt(0)
+            g_layout.removeItem(item)
+            item.widget().hide()
 
-        self.canvas = FigureCanvasQTAgg(fig)
-        self.navbar = NavigationToolbar2QT(self.canvas, self, coordinates=False)
-        self.navbar.setSizePolicy(PyQt5.QtWidgets.QSizePolicy.Expanding, PyQt5.QtWidgets.QSizePolicy.Fixed)
+        canvas = FigureCanvasQTAgg(fig)
+        navbar = NavigationToolbar2QT(canvas, None, coordinates=False)
 
-        self.ui.GraphWidget.addWidget(self.canvas)
-        self.ui.GraphWidget.addWidget(self.navbar)
+        g_layout.addWidget(canvas)
+        g_layout.addWidget(navbar)
 
     def clean_list(self):
         self.ui.NodeList.clear()
@@ -141,14 +170,13 @@ class MainWin(QtWidgets.QMainWindow):
 
     def render_ui(self):
         self.clean_list()
+
         if self.sys.parking:
             self.show_node(ParkingField(self.sys.parking, self.show_dialog))
-
-        for wnode in self.sys.warehouses:
-            self.show_node(WarehouseField(wnode, self.show_dialog))
-
-        for cnode in self.sys.consumers:
-            self.show_node(ConsumerField(cnode, self.show_dialog))
+        for w_node in self.sys.warehouses:
+            self.show_node(WarehouseField(w_node, self.show_dialog))
+        for c_node in self.sys.consumers:
+            self.show_node(ConsumerField(c_node, self.show_dialog))
 
         self.build_figure()
 
