@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QLineEdit, QDoubleSpinBox
 
-from entities.transport import Transport
+from entities import Transport
 
 
 class TrackFiled(QWidget):

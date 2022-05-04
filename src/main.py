@@ -8,6 +8,8 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 
 import ui.styles as st
 from entities import *
+from entities import Product
+from entities import RouteBuilder
 from graphics import get_figure
 from interface import *
 from interface import GuiMainWin
@@ -202,4 +204,5 @@ def main():
 
 
 if __name__ == '__main__':
+    r = RouteBuilder(init_system())
     main()

@@ -2,7 +2,7 @@ from typing import List
 
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QComboBox, QSizePolicy, QSpacerItem, QDoubleSpinBox, QPushButton
 
-from entities.geonode import GeoNode
+from entities import GeoNode
 
 
 class LinkField(QWidget):

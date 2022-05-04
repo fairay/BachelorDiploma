@@ -12,11 +12,18 @@
       "json://{\"py/id\": 7}": {
         "py/id": 10
       },
-      "json://{\"py/object\": \"entities.geonode.Warehouse\", \"name\": \"Склад №3\", \"linked\": {\"json://{\\\"py/id\\\": 3}\": {\"py/object\": \"entities.road.Road\", \"dist\": 1.0, \"time\": 1.0}, \"json://{\\\"py/object\\\": \\\"entities.geonode.Consumer\\\", \\\"name\\\": \\\"Потребитель №1\\\", \\\"linked\\\": {\\\"json://{\\\\\\\"py/id\\\\\\\": 16}\\\": {\\\"py/object\\\": \\\"entities.road.Road\\\", \\\"dist\\\": 1.0, \\\"time\\\": 1.0}}, \\\"order\\\": [{\\\"py/object\\\": \\\"entities.geonode.Product\\\", \\\"name\\\": \\\"кола\\\", \\\"amount\\\": 15}, {\\\"py/object\\\": \\\"entities.geonode.Product\\\", \\\"name\\\": \\\"шоколад\\\", \\\"amount\\\": 25}]}\": {\"py/id\": 21}}, \"stock\": [{\"py/object\": \"entities.geonode.Product\", \"name\": \"кола\", \"amount\": 10}, {\"py/object\": \"entities.geonode.Product\", \"name\": \"шоколад\", \"amount\": 20}]}": {
-        "py/id": 18
+      "json://{\"py/object\": \"entities.geonode.Warehouse\", \"name\": \"Склад №3\", \"linked\": {\"json://{\\\"py/object\\\": \\\"entities.geonode.Consumer\\\", \\\"name\\\": \\\"Потребитель №1\\\", \\\"linked\\\": {\\\"json://{\\\\\\\"py/id\\\\\\\": 16}\\\": {\\\"py/object\\\": \\\"entities.road.Road\\\", \\\"dist\\\": 1.0, \\\"time\\\": 1.0}}, \\\"order\\\": [{\\\"py/object\\\": \\\"entities.geonode.Product\\\", \\\"name\\\": \\\"кола\\\", \\\"amount\\\": 15}, {\\\"py/object\\\": \\\"entities.geonode.Product\\\", \\\"name\\\": \\\"шоколад\\\", \\\"amount\\\": 25}]}\": {\"py/id\": 20}, \"json://{\\\"py/id\\\": 3}\": {\"py/object\": \"entities.road.Road\", \"dist\": 1.0, \"time\": 1.0}}, \"stock\": [{\"py/object\": \"entities.geonode.Product\", \"name\": \"кола\", \"amount\": 10}, {\"py/object\": \"entities.geonode.Product\", \"name\": \"шоколад\", \"amount\": 20}]}": {
+        "py/id": 24
       }
     },
-    "transport": []
+    "transport": [
+      {
+        "py/object": "entities.transport.Transport",
+        "name": "Газель",
+        "volume": 3.0,
+        "cons": 8.0
+      }
+    ]
   },
   "warehouses": [
     {
@@ -31,7 +38,7 @@
   ],
   "consumers": [
     {
-      "py/id": 19
+      "py/id": 18
     }
   ],
   "vol": 1.0,
