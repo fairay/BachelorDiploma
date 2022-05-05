@@ -3,25 +3,25 @@
   "transport": [],
   "routes": [],
   "parking": {
-    "py/object": "entities.geonode.Parking",
+    "py/object": "entities.nodes.parking.Parking",
     "name": "Стоянка",
     "linked": {
-      "json://{\"py/object\": \"entities.geonode.Warehouse\", \"name\": \"Склад №1\", \"linked\": {\"json://{\\\"py/object\\\": \\\"entities.geonode.Warehouse\\\", \\\"name\\\": \\\"Склад №2\\\", \\\"linked\\\": {\\\"json://{\\\\\\\"py/id\\\\\\\": 5}\\\": {\\\"py/object\\\": \\\"entities.road.Road\\\", \\\"dist\\\": 1.0, \\\"time\\\": 1.0}, \\\"json://{\\\\\\\"py/id\\\\\\\": 3}\\\": {\\\"py/object\\\": \\\"entities.road.Road\\\", \\\"dist\\\": 1.0, \\\"time\\\": 1.0}}, \\\"stock\\\": [{\\\"py/object\\\": \\\"entities.geonode.Product\\\", \\\"name\\\": \\\"кола\\\", \\\"amount\\\": 10}]}\": {\"py/id\": 9}, \"json://{\\\"py/id\\\": 3}\": {\"py/object\": \"entities.road.Road\", \"dist\": 1.0, \"time\": 1.0}}, \"stock\": [{\"py/object\": \"entities.geonode.Product\", \"name\": \"шоколад\", \"amount\": 10}]}": {
-        "py/id": 13
+      "json://{\"py/object\": \"entities.nodes.warehouse.Warehouse\", \"name\": \"Склад №1\", \"linked\": {\"json://{\\\"py/object\\\": \\\"entities.nodes.warehouse.Warehouse\\\", \\\"name\\\": \\\"Склад №2\\\", \\\"linked\\\": {\\\"json://{\\\\\\\"py/id\\\\\\\": 5}\\\": {\\\"py/object\\\": \\\"entities.road.Road\\\", \\\"dist\\\": 1.0, \\\"time\\\": 1.0}, \\\"json://{\\\\\\\"py/id\\\\\\\": 3}\\\": {\\\"py/object\\\": \\\"entities.road.Road\\\", \\\"dist\\\": 1.0, \\\"time\\\": 1.0}}, \\\"stock\\\": {\\\"py/object\\\": \\\"entities.product.ProductList\\\", \\\"py/seq\\\": [{\\\"py/object\\\": \\\"entities.product.Product\\\", \\\"name\\\": \\\"кола\\\", \\\"amount\\\": 10}]}, \\\"rest\\\": {\\\"py/object\\\": \\\"entities.product.ProductList\\\", \\\"py/seq\\\": []}}\": {\"py/id\": 9}, \"json://{\\\"py/id\\\": 3}\": {\"py/object\": \"entities.road.Road\", \"dist\": 1.0, \"time\": 1.0}}, \"stock\": {\"py/object\": \"entities.product.ProductList\", \"py/seq\": [{\"py/object\": \"entities.product.Product\", \"name\": \"шоколад\", \"amount\": 10}]}, \"rest\": {\"py/object\": \"entities.product.ProductList\", \"py/seq\": []}}": {
+        "py/id": 14
       },
       "json://{\"py/id\": 7}": {
         "py/id": 10
       },
-      "json://{\"py/object\": \"entities.geonode.Warehouse\", \"name\": \"Склад №3\", \"linked\": {\"json://{\\\"py/object\\\": \\\"entities.geonode.Consumer\\\", \\\"name\\\": \\\"Потребитель №1\\\", \\\"linked\\\": {\\\"json://{\\\\\\\"py/id\\\\\\\": 16}\\\": {\\\"py/object\\\": \\\"entities.road.Road\\\", \\\"dist\\\": 1.0, \\\"time\\\": 1.0}}, \\\"order\\\": [{\\\"py/object\\\": \\\"entities.geonode.Product\\\", \\\"name\\\": \\\"кола\\\", \\\"amount\\\": 15}, {\\\"py/object\\\": \\\"entities.geonode.Product\\\", \\\"name\\\": \\\"шоколад\\\", \\\"amount\\\": 25}]}\": {\"py/id\": 20}, \"json://{\\\"py/id\\\": 3}\": {\"py/object\": \"entities.road.Road\", \"dist\": 1.0, \"time\": 1.0}}, \"stock\": [{\"py/object\": \"entities.geonode.Product\", \"name\": \"кола\", \"amount\": 10}, {\"py/object\": \"entities.geonode.Product\", \"name\": \"шоколад\", \"amount\": 20}]}": {
-        "py/id": 24
+      "json://{\"py/object\": \"entities.nodes.warehouse.Warehouse\", \"name\": \"Склад №3\", \"linked\": {\"json://{\\\"py/object\\\": \\\"entities.nodes.consumer.Consumer\\\", \\\"name\\\": \\\"Потребитель №1\\\", \\\"linked\\\": {\\\"json://{\\\\\\\"py/id\\\\\\\": 18}\\\": {\\\"py/object\\\": \\\"entities.road.Road\\\", \\\"dist\\\": 1.0, \\\"time\\\": 1.0}}, \\\"order\\\": {\\\"py/object\\\": \\\"entities.product.ProductList\\\", \\\"py/seq\\\": [{\\\"py/object\\\": \\\"entities.product.Product\\\", \\\"name\\\": \\\"кола\\\", \\\"amount\\\": 15}, {\\\"py/object\\\": \\\"entities.product.Product\\\", \\\"name\\\": \\\"шоколад\\\", \\\"amount\\\": 25}]}, \\\"rest\\\": {\\\"py/object\\\": \\\"entities.product.ProductList\\\", \\\"py/seq\\\": []}}\": {\"py/id\": 22}, \"json://{\\\"py/id\\\": 3}\": {\"py/object\": \"entities.road.Road\", \"dist\": 1.0, \"time\": 1.0}}, \"stock\": {\"py/object\": \"entities.product.ProductList\", \"py/seq\": [{\"py/object\": \"entities.product.Product\", \"name\": \"кола\", \"amount\": 10}, {\"py/object\": \"entities.product.Product\", \"name\": \"шоколад\", \"amount\": 20}]}, \"rest\": {\"py/object\": \"entities.product.ProductList\", \"py/seq\": []}}": {
+        "py/id": 27
       }
     },
     "transport": [
       {
         "py/object": "entities.transport.Transport",
         "name": "Газель",
-        "volume": 3.0,
-        "cons": 8.0
+        "volume": 10.0,
+        "cons": 10.0
       }
     ]
   },
@@ -33,12 +33,12 @@
       "py/id": 7
     },
     {
-      "py/id": 16
+      "py/id": 18
     }
   ],
   "consumers": [
     {
-      "py/id": 18
+      "py/id": 20
     }
   ],
   "vol": 1.0,

@@ -1,8 +1,8 @@
 from copy import copy
 from typing import List, Dict
 
-from .product import Product, ProductList
-from .geonode import Warehouse, Consumer
+from .nodes import Warehouse, Consumer
+from .product import ProductList
 from .route import Route
 from .system import TransportSystem
 
@@ -37,6 +37,7 @@ class RouteBuilder(object):
 
     def __init__(self, sys: TransportSystem):
         self.sys = sys
+        sys.check_valid()
         self.init_orders()
 
     def init_orders(self):
@@ -54,9 +55,27 @@ class RouteBuilder(object):
         return routes
 
     def _init_routes(self) -> List[Route]:
+        all_routes: List[Route] = []
+        for c_node in self.sys.consumers:
+            for w_node in c_node.linked:
+                if not isinstance(w_node, Warehouse):
+                    continue
+
+                w_node: Warehouse
+                route = Route(self.sys.parking, w_node, c_node)
+                all_routes.append(route)
+
+        all_routes.sort(key=lambda route: route.dist)
+
+        transport = self.sys.parking.transport
 
         # for c_node in self.sys.consumers:
-        #     c_node.linked
+        #     for w_node in c_node.linked:
+        #         if not isinstance(w_node, Warehouse):
+        #             continue
+        #
+        #         w_node: Warehouse
+        #         w_node.
 
         return []
 

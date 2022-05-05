@@ -1,4 +1,5 @@
-from entities import Road, GeoNode
+from .nodes import GeoNode
+from .road import Road
 
 
 class LinkedRoad(Road):

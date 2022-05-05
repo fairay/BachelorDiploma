@@ -2,7 +2,8 @@ from copy import copy
 
 from PyQt5.QtWidgets import QPushButton, QVBoxLayout, QListWidget, QListWidgetItem
 
-from entities import TransportSystem, Consumer, Product
+from entities import TransportSystem, Product
+from entities.nodes import Consumer
 from ui.dialogs.node import NodeDialog
 from ui.fields import ProductFiled
 

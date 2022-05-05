@@ -1,17 +1,20 @@
 from typing import List
 
-from entities import Parking, GeoNode, Road
+from .nodes import Parking, GeoNode
+from .road import Road
 
 
 class Route:
-    def __init__(self, parking: Parking):
+    def __init__(self, parking: Parking, *nodes: GeoNode):
         self.nodes: List[GeoNode] = [parking]
+        for node in nodes:
+            self.add_node(node)
 
     def add_node(self, node: GeoNode):
         if self.nodes[-1].is_linked(node):
             self.nodes.append(node)
         else:
-            raise Exception('No road for next row')
+            raise Exception('No road for next node')
 
     @property
     def dist(self) -> float:

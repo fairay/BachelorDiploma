@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import Union
 
 
 class Product:
@@ -21,16 +21,20 @@ class Product:
     def __repr__(self) -> str:
         return f'{self.name}: {self.amount}'
 
-    def cross(self, stock: 'ProductList', order: 'ProductList'):
-        cross_list = []
 
-        return cross_list
-
-
-class ProductList(list):
-    def __getitem__(self, item) -> Product:
-        return super(ProductList, self).__getitem__(item)
-
+class ProductList(list[Product]):
     def by_name(self, name: str) -> Product | None:
         found = list(filter(lambda node: node.name == name, self))
         return found[0] if found else None
+
+    def __sub__(self, other: 'ProductList'):
+        return self.cross(other)
+
+    def cross(self, other: 'ProductList') -> 'ProductList':
+        cross_list = ProductList()
+        for product in self:
+            stock_prod = other.by_name(product.name)
+            if stock_prod:
+                cross = Product(product.name, min(product.amount, stock_prod.amount))
+                cross_list.append(cross)
+        return cross_list

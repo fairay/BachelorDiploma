@@ -3,7 +3,8 @@ from typing import Callable, Any, Type
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QSpacerItem, QSizePolicy
 
-from entities import GeoNode, Warehouse, Parking, Consumer
+from entities import GeoNode
+from entities.nodes import Warehouse, Parking, Consumer
 from ui.dialogs.consumer import ConsumerDialog
 from ui.dialogs.node import NodeDialog
 from ui.dialogs.parking import ParkingDialog

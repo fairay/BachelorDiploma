@@ -2,7 +2,8 @@ from typing import List, Optional, Union, TextIO
 
 import jsonpickle
 
-from entities.geonode import Parking, Warehouse, Consumer, GeoNode
+from entities.nodes import Warehouse, Parking, Consumer
+from entities.nodes.geonode import GeoNode
 from entities.road import Road
 from entities.route import Route
 from entities.transport import Transport
@@ -34,7 +35,24 @@ class TransportSystem(object):
 
         return data
 
-    def add_warehouse(self, node: Warehouse):
+    def check_valid(self) -> None:
+        if self.parking is None:
+            raise Exception("No parking")
+
+        for w_node in self.warehouses:
+            if self.parking not in w_node.linked.keys():
+                raise Exception(f'{w_node} not linked with parking')
+
+        for c_node in self.consumers:
+            if not len(c_node.linked):
+                raise Exception(f'{c_node} has no roads')
+
+    def add_warehouse(self, node: Warehouse, parking_road: Road = None):
+        if not node.is_linked(self.parking):
+            if parking_road is None:
+                parking_road = Road()
+            node.add_node(self.parking, parking_road)
+
         self.warehouses.append(node)
 
     def add_consumer(self, node: Consumer):
