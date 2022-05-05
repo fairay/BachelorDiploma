@@ -1,7 +1,7 @@
 from copy import copy
 from typing import *
 
-from .product import Product
+from .product import Product, ProductList
 from .road import Road
 from .transport import Transport
 
@@ -62,7 +62,7 @@ class GeoNode(object):
 
 
 class Warehouse(GeoNode):
-    def __init__(self, stock: List[Product], name=""):
+    def __init__(self, stock: ProductList, name=""):
         super().__init__(name)
         self.stock = stock
 
@@ -126,9 +126,9 @@ class Parking(GeoNode):
 
 
 class Consumer(GeoNode):
-    def __init__(self, order: List[Product], name='Потребитель'):
+    def __init__(self, order: ProductList, name='Потребитель'):
         super().__init__(name)
-        self.order: List[Product] = order
+        self.order = order
 
     def __copy__(self) -> 'Consumer':
         new = Consumer(self.order, self.name)

@@ -29,11 +29,11 @@ def init_system():
 
     tsys.add_parking(init_parking())
 
-    tsys.add_warehouse(Warehouse([Product('шоколад', 10)], "Склад №1"))
-    tsys.add_warehouse(Warehouse([Product('кола', 10)], "Склад №2"))
-    tsys.add_warehouse(Warehouse([Product('кола', 10), Product('шоколад', 20)], "Склад №3"))
+    tsys.add_warehouse(Warehouse(ProductList([Product('шоколад', 10)]), "Склад №1"))
+    tsys.add_warehouse(Warehouse(ProductList([Product('кола', 10)]), "Склад №2"))
+    tsys.add_warehouse(Warehouse(ProductList([Product('кола', 10), Product('шоколад', 20)]), "Склад №3"))
 
-    c = Consumer([Product('кола', 15), Product('шоколад', 25)], "Потребитель №1")
+    c = Consumer(ProductList([Product('кола', 15), Product('шоколад', 25)]), "Потребитель №1")
     tsys.add_consumer(c)
 
     tsys.add_link(0, 1)
@@ -91,7 +91,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.show_dialog(ParkingDialog, node)
 
     def action_warehouse(self):
-        node = Warehouse([])
+        node = Warehouse(ProductList())
         self.sys.add_warehouse(node)
         self.unsaved = True
 
@@ -99,7 +99,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.show_dialog(WarehouseDialog, node)
 
     def action_consumer(self):
-        node = Consumer([])
+        node = Consumer(ProductList())
         self.sys.add_consumer(node)
         self.unsaved = True
 

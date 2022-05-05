@@ -1,14 +1,14 @@
 from copy import copy
 from typing import List, Dict
 
-from . import Product
+from .product import Product, ProductList
 from .geonode import Warehouse, Consumer
 from .route import Route
 from .system import TransportSystem
 
 
-def collect_products(*node_products: List[Product]) -> List[Product]:
-    collapsed_arr: List[Product] = []
+def collect_products(*node_products: ProductList) -> ProductList:
+    collapsed_arr = ProductList()
     for products in node_products:
         for prod in products:
             old_prod = list(filter(lambda p: p.name == prod.name, collapsed_arr))
@@ -19,23 +19,21 @@ def collect_products(*node_products: List[Product]) -> List[Product]:
     return collapsed_arr
 
 
-def enough_products(stock: List[Product], order: List[Product]):
+def enough_products(stock: ProductList, order: ProductList) -> bool:
     for prod in order:
-        stock_prods = list(filter(lambda p: p.name == prod.name, stock))
-        if not stock_prods:
-            return False
-        elif stock_prods[0].amount < prod.amount:
+        stock_prods = stock.by_name(prod.name)
+        if stock_prods is None or stock_prods.amount < prod.amount:
             return False
     return True
 
 
 class RouteBuilder(object):
     sys: TransportSystem
-    all_stocks: List[Product]
-    all_orders: List[Product]
+    all_stocks: ProductList
+    all_orders: ProductList
 
-    stocks: Dict[Warehouse, List[Product]]
-    orders: Dict[Consumer, List[Product]]
+    stocks: Dict[Warehouse, ProductList]
+    orders: Dict[Consumer, ProductList]
 
     def __init__(self, sys: TransportSystem):
         self.sys = sys
@@ -57,8 +55,8 @@ class RouteBuilder(object):
 
     def _init_routes(self) -> List[Route]:
 
-        for c_node in self.sys.consumers:
-            c_node.linked
+        # for c_node in self.sys.consumers:
+        #     c_node.linked
 
         return []
 
