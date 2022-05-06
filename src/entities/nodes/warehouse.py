@@ -8,13 +8,13 @@ class Warehouse(GeoNode):
     stock: ProductList
     rest: ProductList
 
-    def __init__(self, stock: ProductList, name="Склад"):
+    def __init__(self, name="Склад", *stock: Product):
         super().__init__(name)
-        self.stock = stock
+        self.stock = ProductList(stock)
         self.rest = ProductList()
 
     def __copy__(self) -> 'Warehouse':
-        new = Warehouse(self.stock, self.name)
+        new = Warehouse(self.name, *self.stock)
         new.linked = copy(self.linked)
         new.stock = copy(self.stock)
         return new
@@ -35,6 +35,6 @@ class Warehouse(GeoNode):
     def update(self, other: 'Warehouse'):
         super(Warehouse, self).update(other)
 
-        self.stock = []
+        self.stock = ProductList()
         for product in other.stock:
             self.add_product(product)

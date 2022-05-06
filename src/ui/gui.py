@@ -54,7 +54,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addLayout(self.GraphWidget, 1, 1, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1075, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1075, 22))
         self.menubar.setObjectName("menubar")
         self.menu = QtWidgets.QMenu(self.menubar)
         self.menu.setObjectName("menu")

@@ -1,5 +1,6 @@
 import sys
-from typing import Type
+from copy import copy
+from typing import Type, Dict
 
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QListWidgetItem, QFileDialog, QShortcut
@@ -17,30 +18,58 @@ from ui.dialogs import ParkingDialog, WarehouseDialog, ConsumerDialog
 from ui.dialogs.node import NodeDialog
 from ui.node_list import WarehouseField, ListField, ParkingField, ConsumerField
 
+a = 10_000
+def init_transport() -> Dict[Transport, int]:
+    return {
+        Transport("ГАЗель NEXT", 13.500, 10.0): 1,
+        Transport('Ford Transit', 5.190, 10.0): 0, # V - 4200-15100
+        Transport('ГАЗель Бизнес', 9.000, 10.0): 0, # V - 9000-11000
+
+        Transport("LADA Largus универсал", 2.350, 10.0): 1,
+        Transport("УАЗ 3909 Комби", 2.693, 10.0): 1,
+        Transport('ГАЗ-2752 «Соболь Бизнес»', 6.860, 10.0): 0,
+
+        Transport('УАЗ «Профи»', 7.200, 10.0): 0,
+        Transport('ГАЗ-3221', 8.370, 10.0): 0, # V - ?
+        Transport('УАЗ-2206', 2.000, 10.0): 0,  # V - ???
+
+        Transport('Hyundai Starex (H-1)', 4.400, 10.0): 0,
+    }
 
 def init_parking() -> Parking:
     p = Parking()
-    p.add_transport(Transport("Газель", 10, 10))
+
+    transport = init_transport()
+    for truck, amount in transport.items():
+        for _ in range(amount):
+            p.add_transport(copy(truck))
+
     return p
 
 
 def init_system():
     tsys = TransportSystem()
+    tsys.vol = 0.2
 
     tsys.add_parking(init_parking())
 
-    tsys.add_warehouse(Warehouse(ProductList([Product('шоколад', 10)]), "Склад №1"))
-    tsys.add_warehouse(Warehouse(ProductList([Product('кола', 10)]), "Склад №2"))
-    tsys.add_warehouse(Warehouse(ProductList([Product('кола', 10), Product('шоколад', 20)]), "Склад №3"))
+    tsys.add_warehouse(Warehouse("Склад №1", Product('шоколад', 10) ))
+    tsys.add_warehouse(Warehouse("Склад №2", Product('кола', 10), Product('кофе', 20)  ))
+    tsys.add_warehouse(Warehouse("Склад №3", Product('кола', 10), Product('шоколад', 20) ))
 
-    c = Consumer(ProductList([Product('кола', 15), Product('шоколад', 25)]), "Потребитель №1")
-    tsys.add_consumer(c)
+    tsys.add_consumer(Consumer("Потребитель №1", Product('кола', 15), Product('шоколад', 10)))
+    tsys.add_consumer(Consumer("Потребитель №2", Product('кола', 3), Product('шоколад', 5), Product('кофе', 10)))
+    tsys.add_consumer(Consumer("Потребитель №3", Product('шоколад', 5)))
 
     tsys.add_link(0, 1)
     tsys.add_link(0, 2)
     tsys.add_link(0, 3)
+
     tsys.add_link(1, 2)
     tsys.add_link(4, 3)
+    tsys.add_link(5, 1)
+    tsys.add_link(5, 2)
+    tsys.add_link(6, 1)
 
     return tsys
 
@@ -91,7 +120,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.show_dialog(ParkingDialog, node)
 
     def action_warehouse(self):
-        node = Warehouse(ProductList())
+        node = Warehouse()
         self.sys.add_warehouse(node)
         self.unsaved = True
 
@@ -99,7 +128,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.show_dialog(WarehouseDialog, node)
 
     def action_consumer(self):
-        node = Consumer(ProductList())
+        node = Consumer()
         self.sys.add_consumer(node)
         self.unsaved = True
 
@@ -205,4 +234,5 @@ def main():
 
 if __name__ == '__main__':
     r = RouteBuilder(init_system())
+    routes = r.calc_routes()
     main()

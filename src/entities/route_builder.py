@@ -67,17 +67,39 @@ class RouteBuilder(object):
 
         all_routes.sort(key=lambda route: route.dist)
 
-        transport = self.sys.parking.transport
+        transport = copy(self.sys.parking.transport)
+        transport.sort(key=lambda track: track.volume)
+        routes = []
 
-        # for c_node in self.sys.consumers:
-        #     for w_node in c_node.linked:
-        #         if not isinstance(w_node, Warehouse):
-        #             continue
-        #
-        #         w_node: Warehouse
-        #         w_node.
+        for route in all_routes:
+            c_node: Consumer = route.nodes[-1]
+            w_node: Warehouse = route.nodes[-2]
 
-        return []
+            stock = self.stocks[w_node]
+            order = self.orders[c_node]
+            if stock.is_empty() or order.is_empty():
+                continue
+
+            cross_products = order * stock
+            cross_volume = cross_products.volume(self.sys.vol)
+            selected_track = None
+            for track in transport:
+                if track.volume >= cross_volume:
+                    selected_track = track
+                    break
+            else:
+                # TODO: Split order and repeat operation
+                pass
+
+            r = copy(route)
+            stock.minus(cross_products)
+            order.minus(cross_products)
+            r.set_track(selected_track)
+            r.set_load(w_node, cross_products)
+            r.set_load(c_node, cross_products)
+            routes.append(r)
+
+        return routes
 
     def _main_routes(self, pre_routes: List[Route]) -> List[Route]:
-        return []
+        return pre_routes

@@ -60,6 +60,7 @@ class TransportSystem(object):
 
     def add_parking(self, node: Parking):
         self.parking = node
+        self.transport = self.parking.transport
 
     def add_transport(self, truck: Transport):
         self.transport.append(truck)

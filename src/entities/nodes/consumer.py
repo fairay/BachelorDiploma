@@ -8,13 +8,13 @@ class Consumer(GeoNode):
     order: ProductList
     rest: ProductList
 
-    def __init__(self, order: ProductList, name='Потребитель'):
+    def __init__(self, name='Потребитель', *order: Product):
         super().__init__(name)
-        self.order = order
+        self.order = ProductList(order)
         self.rest = ProductList()
 
     def __copy__(self) -> 'Consumer':
-        new = Consumer(self.order, self.name)
+        new = Consumer(self.name, *self.order)
         new.linked = copy(self.linked)
         new.order = copy(self.order)
         return new
@@ -35,6 +35,6 @@ class Consumer(GeoNode):
     def update(self, other: 'Consumer'):
         super(Consumer, self).update(other)
 
-        self.order = []
+        self.order = ProductList()
         for product in other.order:
             self.add_product(product)
