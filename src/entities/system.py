@@ -108,3 +108,14 @@ class TransportSystem(object):
             raise Exception('Unexpected type')
 
     nodes = property(_get_nodes)
+
+    class Loader:
+        @staticmethod
+        def save(sys: 'TransportSystem', f_name: str):
+            with open(f_name, 'w', encoding='utf-8') as f:
+                sys.save_json(f)
+
+        @staticmethod
+        def load(f_name: str) -> 'TransportSystem':
+            with open(f_name, 'r', encoding='utf-8') as f:
+                return TransportSystem.load_json(f)

@@ -147,8 +147,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.render_ui()
 
     def import_sys(self, file_name: str):
-        with open(file_name, 'r', encoding='utf-8') as f:
-            self.sys = TransportSystem.load_json(f)
+        self.sys = TransportSystem.Loader.load(file_name)
         self.sys_file = file_name
 
     def export_action(self):
@@ -170,8 +169,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.render_ui()
 
     def export_sys(self, file_name: str):
-        with open(file_name, 'w', encoding='utf-8') as f:
-            self.sys.save_json(f)
+        TransportSystem.Loader.save(self.sys, file_name)
         self.unsaved = False
         self.sys_file = file_name
 
@@ -233,6 +231,8 @@ def main():
 
 
 if __name__ == '__main__':
+    # tsys = init_system()
+    # TransportSystem.Loader.save(tsys, './configs/data.json')
     r = RouteBuilder(init_system())
     routes = r.calc_routes()
     main()
