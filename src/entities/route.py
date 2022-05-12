@@ -1,16 +1,17 @@
 from copy import copy
 from typing import List
 
-from .product import ProductList
-from .transport import Transport
 from .nodes import Parking, GeoNode
+from .product import ProductList
 from .road import Road
+from .transport import Transport
 
 
 class Route:
     nodes: List[GeoNode]
     track: Transport | None
     loads: List[ProductList]
+
     def __init__(self, parking: Parking, *nodes: GeoNode):
         self.track = None
         self.nodes = [parking]
@@ -22,7 +23,7 @@ class Route:
     def __copy__(self) -> 'Route':
         new_route = Route(*self.nodes)
         new_route.loads = copy(self.loads)
-        return  new_route
+        return new_route
 
     def __repr__(self) -> str:
         s = ' -> '.join(map(str, self.nodes))

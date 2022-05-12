@@ -1,6 +1,6 @@
 import sys
 from copy import copy
-from typing import Type, Dict
+from typing import Type, Dict, List
 
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QListWidgetItem, QFileDialog, QShortcut
@@ -16,25 +16,29 @@ from interface import *
 from interface import GuiMainWin
 from ui.dialogs import ParkingDialog, WarehouseDialog, ConsumerDialog
 from ui.dialogs.node import NodeDialog
+from ui.fields.route import RouteField
 from ui.node_list import WarehouseField, ListField, ParkingField, ConsumerField
 
 a = 10_000
+
+
 def init_transport() -> Dict[Transport, int]:
     return {
         Transport("ГАЗель NEXT", 13.500, 10.0): 1,
-        Transport('Ford Transit', 5.190, 10.0): 0, # V - 4200-15100
-        Transport('ГАЗель Бизнес', 9.000, 10.0): 0, # V - 9000-11000
+        Transport('Ford Transit', 5.190, 10.0): 0,  # V - 4200-15100
+        Transport('ГАЗель Бизнес', 9.000, 10.0): 0,  # V - 9000-11000
 
         Transport("LADA Largus универсал", 2.350, 10.0): 1,
         Transport("УАЗ 3909 Комби", 2.693, 10.0): 1,
         Transport('ГАЗ-2752 «Соболь Бизнес»', 6.860, 10.0): 0,
 
         Transport('УАЗ «Профи»', 7.200, 10.0): 0,
-        Transport('ГАЗ-3221', 8.370, 10.0): 0, # V - ?
+        Transport('ГАЗ-3221', 8.370, 10.0): 0,  # V - ?
         Transport('УАЗ-2206', 2.000, 10.0): 0,  # V - ???
 
         Transport('Hyundai Starex (H-1)', 4.400, 10.0): 0,
     }
+
 
 def init_parking() -> Parking:
     p = Parking()
@@ -53,9 +57,9 @@ def init_system():
 
     tsys.add_parking(init_parking())
 
-    tsys.add_warehouse(Warehouse("Склад №1", Product('шоколад', 10) ))
-    tsys.add_warehouse(Warehouse("Склад №2", Product('кола', 10), Product('кофе', 20)  ))
-    tsys.add_warehouse(Warehouse("Склад №3", Product('кола', 10), Product('шоколад', 20) ))
+    tsys.add_warehouse(Warehouse("Склад №1", Product('шоколад', 10)))
+    tsys.add_warehouse(Warehouse("Склад №2", Product('кола', 10), Product('кофе', 20)))
+    tsys.add_warehouse(Warehouse("Склад №3", Product('кола', 10), Product('шоколад', 20)))
 
     tsys.add_consumer(Consumer("Потребитель №1", Product('кола', 15), Product('шоколад', 10)))
     tsys.add_consumer(Consumer("Потребитель №2", Product('кола', 3), Product('шоколад', 5), Product('кофе', 10)))
@@ -79,6 +83,8 @@ class MainWin(QtWidgets.QMainWindow):
     window_title = 'Оптимизация маршрутов поставок'
 
     sys: TransportSystem
+    routes: List[Route]
+
     sys_file: str
     unsaved: bool
 
@@ -94,18 +100,24 @@ class MainWin(QtWidgets.QMainWindow):
             self.sys = tsys
         else:
             self.import_sys(sys_file)
+        self.routes = []
 
         self.render_ui()
         self.set_binds()
 
     def set_binds(self):
         QShortcut(QKeySequence("Ctrl+S"), self).activated.connect(self.export_click)
+        self.ui.routeList.clicked.connect(self.build_figure)
+        self.ui.nodeList.clicked.connect(self.build_figure)
+
         self.ui.import_action.triggered.connect(self.import_action)
         self.ui.export_action.triggered.connect(self.export_action)
 
         self.ui.action_parking.triggered.connect(self.action_parking)
         self.ui.action_warehouse.triggered.connect(self.action_warehouse)
         self.ui.action_consumer.triggered.connect(self.action_consumer)
+
+        self.ui.calcRoutesW.clicked.connect(self.build_routes)
 
     def action_parking(self):
         if self.sys.parking:
@@ -174,7 +186,15 @@ class MainWin(QtWidgets.QMainWindow):
         self.sys_file = file_name
 
     def build_figure(self):
-        fig = get_figure(self.sys)
+        cur_route_i = self.ui.routeList.currentRow()
+        cur_route = self.routes[cur_route_i] if cur_route_i != -1 else None
+
+        cur_node_i = self.ui.nodeList.currentRow()
+        cur_node = self.sys.nodes[cur_node_i] if cur_node_i != -1 else None
+        print(cur_route, cur_node)
+
+        fig = get_figure(self.sys, cur_route, cur_node)
+
         g_layout = self.ui.GraphWidget
 
         while g_layout.count():
@@ -189,13 +209,13 @@ class MainWin(QtWidgets.QMainWindow):
         g_layout.addWidget(navbar)
 
     def clean_list(self):
-        self.ui.NodeList.clear()
+        self.ui.nodeList.clear()
 
     def show_node(self, widget: ListField):
-        item = QListWidgetItem(self.ui.NodeList)
+        item = QListWidgetItem(self.ui.nodeList)
         item.setSizeHint(widget.sizeHint())
-        self.ui.NodeList.addItem(item)
-        self.ui.NodeList.setItemWidget(item, widget)
+        self.ui.nodeList.addItem(item)
+        self.ui.nodeList.setItemWidget(item, widget)
 
     def render_ui(self):
         self.clean_list()
@@ -217,6 +237,24 @@ class MainWin(QtWidgets.QMainWindow):
         if code:
             self.unsaved = True
             self.render_ui()
+
+    def clean_routes(self):
+        self.ui.routeList.clear()
+
+    def show_route(self, route: Route):
+        widget = RouteField(route)
+        item = QListWidgetItem(self.ui.routeList)
+        item.setSizeHint(widget.sizeHint())
+        self.ui.routeList.addItem(item)
+        self.ui.routeList.setItemWidget(item, widget)
+
+    def build_routes(self):
+        route_builder = RouteBuilder(self.sys)
+        self.routes = route_builder.routes
+
+        self.clean_routes()
+        for route in routes:
+            self.show_route(route)
 
 
 def main():

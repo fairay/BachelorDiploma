@@ -37,6 +37,7 @@ class RouteBuilder(object):
 
     def __init__(self, sys: TransportSystem):
         self.sys = sys
+
         sys.check_valid()
         self.init_orders()
 
@@ -52,6 +53,7 @@ class RouteBuilder(object):
     def calc_routes(self) -> List[Route]:
         routes = self._init_routes()
         routes = self._main_routes(routes)
+
         return routes
 
     def _init_routes(self) -> List[Route]:
@@ -71,9 +73,9 @@ class RouteBuilder(object):
         transport.sort(key=lambda track: track.volume)
         routes = []
 
-        for route in all_routes:
-            c_node: Consumer = route.nodes[-1]
-            w_node: Warehouse = route.nodes[-2]
+        for r in all_routes:
+            c_node: Consumer = r.nodes[-1]
+            w_node: Warehouse = r.nodes[-2]
 
             stock = self.stocks[w_node]
             order = self.orders[c_node]
@@ -91,7 +93,7 @@ class RouteBuilder(object):
                 # TODO: Split order and repeat operation
                 pass
 
-            r = copy(route)
+            r = copy(r)
             stock.minus(cross_products)
             order.minus(cross_products)
             r.set_track(selected_track)
@@ -103,3 +105,8 @@ class RouteBuilder(object):
 
     def _main_routes(self, pre_routes: List[Route]) -> List[Route]:
         return pre_routes
+
+    @property
+    def routes(self) -> List[Route]:
+        routes = self.calc_routes()
+        return routes
