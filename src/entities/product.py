@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 
 
 class Product:
@@ -20,6 +20,21 @@ class Product:
 
     def __repr__(self) -> str:
         return f'{self.name}: {self.amount}'
+
+    def volume(self, prod_vol: float = 1.0):
+        return self.amount * prod_vol
+
+    def split(self, new_amount: int) -> Optional['Product']:
+        if new_amount >= self.amount:
+            return None
+
+        rem = Product(self.name, self.amount - new_amount)
+        self.amount -= new_amount
+        return rem
+
+    def to_restriction(self, volume: float, prod_vol: float = 1.0) -> Optional['Product']:
+        new_amount = int(volume / prod_vol)
+        return self.split(new_amount)
 
 
 class ProductList(list[Product]):
@@ -53,5 +68,34 @@ class ProductList(list[Product]):
     def is_empty(self):
         return len(self) == 0
 
-    def volume(self, prod_vol: float = 1.0):
-        return sum(prod.amount for prod in self) * prod_vol
+    def volume(self, prod_vol: float = 1.0) -> float:
+        return sum(prod.volume(prod_vol) for prod in self)
+
+    def to_restriction(self, volume: float, prod_vol: float = 1.0) -> 'ProductList':
+        """
+        Restricts list to fit given volume
+
+        Returns reminder list of products
+        """
+
+        if self.volume(prod_vol) <= volume:
+            return ProductList()
+
+        rem = ProductList(self)
+        rem.sort(key=lambda prod: prod.amount, reverse=True)
+        self.clear()
+
+        self_vol = 0
+        for prod in rem:
+            prod_vol = prod.volume(prod_vol)
+            if self_vol + prod_vol < volume:
+                self.append(prod)
+                self_vol += prod_vol
+        rem.minus(self)
+
+        if self_vol < volume * 0.99:
+            prod = rem[0].to_restriction(volume - self_vol, prod_vol)
+            self.append(rem[0])
+            rem[0] = prod
+
+        return rem

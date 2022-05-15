@@ -1,7 +1,7 @@
 from copy import copy
 from typing import List, Dict
 
-from .nodes import Warehouse, Consumer
+from .nodes import Warehouse, Consumer, Parking, GeoNode
 from .product import ProductList
 from .route import Route
 from .system import TransportSystem
@@ -51,7 +51,7 @@ class RouteBuilder(object):
         self.orders = {c_node: collect_products(c_node.order) for c_node in self.sys.consumers}
 
     def calc_routes(self) -> List[Route]:
-        routes = self._init_routes()
+        routes = self._estimate_routes()
         routes = self._main_routes(routes)
 
         return routes
@@ -68,6 +68,10 @@ class RouteBuilder(object):
                 all_routes.append(route)
 
         all_routes.sort(key=lambda route: route.dist)
+        return all_routes
+
+    def _estimate_routes(self) -> List[Route]:
+        all_routes = self._init_routes()
 
         transport = copy(self.sys.parking.transport)
         transport.sort(key=lambda track: track.volume)
@@ -90,10 +94,10 @@ class RouteBuilder(object):
                     selected_track = track
                     break
             else:
-                # TODO: Split order and repeat operation
-                pass
+                selected_track = transport[-1]
+                cross_products.to_restriction(selected_track.volume, self.sys.vol)
+                all_routes.append(copy(r))
 
-            r = copy(r)
             stock.minus(cross_products)
             order.minus(cross_products)
             r.set_track(selected_track)
@@ -104,6 +108,19 @@ class RouteBuilder(object):
         return routes
 
     def _main_routes(self, pre_routes: List[Route]) -> List[Route]:
+        pot: Dict[GeoNode, float] = {}
+        pot[self.sys.parking] = 0
+
+        for w_node in self.sys.warehouses:
+            pot[w_node] = pot[self.sys.parking] + w_node.dist(self.sys.parking)
+
+        for c_node in self.sys.consumers:
+            dist = []
+            for node, road in c_node.linked.items():
+                if isinstance(node, Warehouse):
+                    dist.append(road.dist + pot[node])
+            pot[c_node] = min(dist)
+
         return pre_routes
 
     @property
