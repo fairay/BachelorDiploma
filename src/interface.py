@@ -9,6 +9,7 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from entities import TransportSystem, Route, Parking, Warehouse, Consumer, GeoNode, RouteBuilder
 from graphics import get_figure
 from ui.dialogs import ParkingDialog, WarehouseDialog, ConsumerDialog, NodeDialog
+from ui.dialogs.route import RouteDialog
 from ui.fields.route import RouteField
 
 from ui.gui import *
@@ -89,7 +90,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.unsaved = True
 
         self.render_ui()
-        self.show_dialog(ParkingDialog, node)
+        self.node_dialog(ParkingDialog, node)
 
     def action_warehouse(self):
         node = Warehouse()
@@ -97,7 +98,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.unsaved = True
 
         self.render_ui()
-        self.show_dialog(WarehouseDialog, node)
+        self.node_dialog(WarehouseDialog, node)
 
     def action_consumer(self):
         node = Consumer()
@@ -105,7 +106,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.unsaved = True
 
         self.render_ui()
-        self.show_dialog(ConsumerDialog, node)
+        self.node_dialog(ConsumerDialog, node)
 
     def import_action(self):
         try:
@@ -151,7 +152,6 @@ class MainWin(QtWidgets.QMainWindow):
 
         cur_node_i = self.ui.nodeList.currentRow()
         cur_node = self.sys.nodes[cur_node_i] if cur_node_i != -1 else None
-        print(cur_route, cur_node)
 
         fig = get_figure(self.sys, cur_route, cur_node)
 
@@ -181,28 +181,21 @@ class MainWin(QtWidgets.QMainWindow):
         self.clean_list()
 
         if self.sys.parking:
-            self.show_node(ParkingField(self.sys.parking, self.show_dialog))
+            self.show_node(ParkingField(self.sys.parking, self.node_dialog))
         for w_node in self.sys.warehouses:
-            self.show_node(WarehouseField(w_node, self.show_dialog))
+            self.show_node(WarehouseField(w_node, self.node_dialog))
         for c_node in self.sys.consumers:
-            self.show_node(ConsumerField(c_node, self.show_dialog))
+            self.show_node(ConsumerField(c_node, self.node_dialog))
 
         self.build_figure()
 
         self.setWindowTitle(f'{self.window_title} ({self.sys_file}{" *" if self.unsaved else ""})')
 
-    def show_dialog(self, dialog: Type[NodeDialog], node: GeoNode):
-        form = dialog(node, self.sys)
-        code = form.exec_()
-        if code:
-            self.unsaved = True
-            self.render_ui()
-
     def clean_routes(self):
         self.ui.routeList.clear()
 
     def show_route(self, r: Route):
-        widget = RouteField(r)
+        widget = RouteField(r, self.route_dialog)
         item = QListWidgetItem(self.ui.routeList)
         item.setSizeHint(widget.sizeHint())
         self.ui.routeList.addItem(item)
@@ -215,3 +208,14 @@ class MainWin(QtWidgets.QMainWindow):
         self.clean_routes()
         for r in self.routes:
             self.show_route(r)
+
+    def node_dialog(self, dialog: Type[NodeDialog], node: GeoNode):
+        form = dialog(node, self.sys)
+        code = form.exec_()
+        if code:
+            self.unsaved = True
+            self.render_ui()
+
+    def route_dialog(self, route: Route):
+        form = RouteDialog(route, self.sys)
+        _ = form.exec_()

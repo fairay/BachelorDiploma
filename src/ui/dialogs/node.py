@@ -21,7 +21,7 @@ class NodeDialog(QDialog):
         self.init_links()
 
     def init_UI(self):
-        self.setMinimumSize(800, 400)
+        self.setMinimumSize(800, 800)
         self.setWindowTitle(self.window_title)
         self.setWindowModality(Qt.ApplicationModal)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))

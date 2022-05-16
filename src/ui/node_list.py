@@ -12,6 +12,8 @@ from ui.dialogs.warehouse import WarehouseDialog
 
 
 class ListField(QWidget):
+    dialog: Type[NodeDialog]
+
     def __init__(self, node: GeoNode, show_dialog: Callable[[Type[NodeDialog], GeoNode], Any]):
         super(ListField, self).__init__(parent=None)
         self.node = node
@@ -35,43 +37,31 @@ class ListField(QWidget):
         self.titleW.setText(self.node.name)
 
     def clickEvent(self):
-        pass
-
-    def closeEvent(self, event):
-        print('onePopUp : close event')
+        try:
+            self.show_dialog(self.dialog, self.node)
+        except Exception as e:
+            print(e)
 
 
 class ParkingField(ListField):
+    dialog = ParkingDialog
+
     def __init__(self, node: Parking, show_dialog: Callable[[Type[NodeDialog], GeoNode], Any]):
         super(ParkingField, self).__init__(node, show_dialog)
         self.titleW.setProperty('class', 'pTitle')
 
-    def clickEvent(self):
-        try:
-            self.show_dialog(ParkingDialog, self.node)
-        except Exception as e:
-            print(e)
-
 
 class WarehouseField(ListField):
+    dialog = WarehouseDialog
+
     def __init__(self, node: Warehouse, show_dialog: Callable[[Type[NodeDialog], GeoNode], Any]):
         super(WarehouseField, self).__init__(node, show_dialog)
         self.titleW.setProperty('class', 'wTitle')
 
-    def clickEvent(self):
-        try:
-            self.show_dialog(WarehouseDialog, self.node)
-        except Exception as e:
-            print(e)
-
 
 class ConsumerField(ListField):
+    dialog = ConsumerDialog
+
     def __init__(self, node: Consumer, show_dialog: Callable[[Type[NodeDialog], GeoNode], Any]):
         super(ConsumerField, self).__init__(node, show_dialog)
         self.titleW.setProperty('class', 'cTitle')
-
-    def clickEvent(self):
-        try:
-            self.show_dialog(ConsumerDialog, self.node)
-        except Exception as e:
-            print(e)

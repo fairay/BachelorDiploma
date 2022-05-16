@@ -1,15 +1,19 @@
+from typing import Callable, Type, Any
+
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy
 
 from entities import Route
+from ui.dialogs.route import RouteDialog
 
 
 class RouteField(QWidget):
     route: Route
 
-    def __init__(self, route: Route):
+    def __init__(self, route: Route, show_dialog: Callable[[Route], Any]):
         super(RouteField, self).__init__(parent=None)
         self.route = route
+        self.show_dialog = show_dialog
 
         self.setProperty('class', 'list')
         self.layout = QHBoxLayout()
@@ -20,7 +24,6 @@ class RouteField(QWidget):
 
         self.layout.addItem(QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum))
         self.updateContent()
-        # self.titleW.setStyleSheet(''' color: rgb(255, 0, 0); ''')
 
     def mouseDoubleClickEvent(self, a0: QMouseEvent) -> None:
         self.clickEvent()
@@ -30,7 +33,7 @@ class RouteField(QWidget):
         self.titleW.setText(str(self.route))
 
     def clickEvent(self):
-        pass
-
-    def closeEvent(self, event):
-        print('onePopUp : close event')
+        try:
+            self.show_dialog(self.route)
+        except Exception as e:
+            print(e)

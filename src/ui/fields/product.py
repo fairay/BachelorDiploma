@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QLineEdit, QSpinBox
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QLineEdit, QSpinBox, QLabel
 
 from entities import Product
 
@@ -50,3 +50,25 @@ class ProductFiled(QWidget):
     @property
     def new_product(self) -> Product:
         return Product(self.title, self.amount)
+
+
+class ProductDeliveryField(QWidget):
+    def __init__(self, parent, product: Product, picked=True):
+        super(ProductDeliveryField, self).__init__(parent=parent)
+
+        self.product = product
+        self.picked = picked
+        self.initUI()
+
+    def initUI(self):
+        self.layout = QHBoxLayout()
+        self.setLayout(self.layout)
+
+        self.layout.addWidget(QLabel('<-' if self.picked else '->', self))
+
+        self.titleW = QLabel(self.product.name, self)
+        self.layout.addWidget(self.titleW)
+
+        amount = self.product.amount
+        self.amountW = QLabel(str(amount), self)
+        self.layout.addWidget(self.amountW)

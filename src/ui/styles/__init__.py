@@ -32,6 +32,11 @@ QListWidget {{
     background-color: {colors['bg']};
 }}
 
+QListWidget.delivery-list {{
+    background-color: {colors['bgAlt']};
+    border-radius: 0px;
+}}
+
 QListWidget::item:selected QListWidget::item:hover {{
     background-color: {colors['bgAlt']};
 }}
