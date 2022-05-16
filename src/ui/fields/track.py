@@ -1,14 +1,19 @@
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QLineEdit, QDoubleSpinBox
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QDoubleSpinBox, QSpinBox
 
 from entities import Transport
 
 
 class TrackFiled(QWidget):
-    def __init__(self, parent, track: Transport):
+    track: Transport
+    amount: int
+
+    def __init__(self, parent, track: Transport, amount: int):
         super(TrackFiled, self).__init__(parent=parent)
 
         self.dialog = parent
         self.track = track
+        self._amount = amount
+
         self.initUI()
         self.initBinds()
 
@@ -23,23 +28,18 @@ class TrackFiled(QWidget):
         self.volumeW = QDoubleSpinBox()
         self.volumeW.setValue(volume)
         self.volumeW.setFrame(0)
+        self.volumeW.setToolTip('Объём (м³)')
         self.layout.addWidget(self.volumeW)
 
-        cons = self.track.cons
-        self.consW = QDoubleSpinBox()
-        self.consW.setValue(cons)
-        self.consW.setFrame(0)
-        self.layout.addWidget(self.consW)
-
-        self.editButton = QPushButton("🗑️")
-        self.editButton.setMaximumWidth(30)
-        self.layout.addWidget(self.editButton)
+        self.amountW = QSpinBox()
+        self.amountW.setValue(self._amount)
+        self.amountW.setMinimum(1)
+        self.amountW.setFrame(0)
+        self.amountW.setToolTip('Количество')
+        self.layout.addWidget(self.amountW)
 
     def initBinds(self):
-        self.editButton.clicked.connect(self.deleteEvent)
-
-    def deleteEvent(self):
-        self.dialog.delete_track(self)
+        pass
 
     @property
     def title(self) -> str: return self.titleW.text()
@@ -54,14 +54,13 @@ class TrackFiled(QWidget):
     def volume(self, value: float): self.volumeW.setValue(value)
 
     @property
-    def cons(self) -> float: return self.consW.value()
+    def amount(self) -> int: return self.amountW.value()
 
-    @cons.setter
-    def cons(self, value: float): self.consW.setValue(value)
+    @amount.setter
+    def amount(self, value: int): self.amountW.setValue(value)
 
     @property
     def new_track(self) -> Transport:
         new_t = Transport(self.title)
-        new_t.cons = self.cons
         new_t.volume = self.volume
         return new_t

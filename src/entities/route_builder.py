@@ -1,7 +1,7 @@
 from copy import copy
 from typing import List, Dict
 
-from .nodes import Warehouse, Consumer, Parking, GeoNode
+from .nodes import Warehouse, Consumer, GeoNode
 from .product import ProductList
 from .route import Route
 from .system import TransportSystem

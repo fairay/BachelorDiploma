@@ -1,10 +1,7 @@
-from typing import Callable, Any, Type
-
-from PyQt5 import QtGui
 from PyQt5.QtWidgets import QWidget, QLabel, QSpacerItem, QSizePolicy, QVBoxLayout, QListWidget, QListWidgetItem
 
 from entities import GeoNode, ProductList, Product
-from entities.nodes import Warehouse, Parking, Consumer
+from entities.nodes import Warehouse
 from ui.fields import ProductDeliveryField
 
 

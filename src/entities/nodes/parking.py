@@ -16,17 +16,15 @@ class Parking(GeoNode):
         new.transport = copy(self.transport)
         return new
 
+    def clear_transport(self):
+        self.transport: List[Transport] = []
+
     def del_transport(self, track: Transport):
         for i, t in enumerate(self.transport):
             if track.name == t.name:
                 del self.transport[i]
 
     def add_transport(self, track: Transport):
-        for i, t in enumerate(self.transport):
-            if track.name == t.name:
-                self.transport[i] = track
-                return
-
         self.transport.append(track)
 
     def update(self, other: 'Parking'):

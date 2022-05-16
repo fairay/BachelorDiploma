@@ -1,14 +1,9 @@
-from copy import copy
-
-from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QHBoxLayout, QSpacerItem, QSizePolicy, QVBoxLayout, QLineEdit, QPushButton, \
-    QListWidgetItem, QListWidget, QMessageBox, QLabel
+from PyQt5.QtWidgets import QDialog, QHBoxLayout, QSpacerItem, QSizePolicy, QVBoxLayout, QListWidgetItem, QListWidget, \
+    QLabel
 
 from entities import *
-from ui.fields import *
 from ui.fields.delivery import DeliveryField
-from ui.node_list import ParkingField
 
 
 class RouteDialog(QDialog):

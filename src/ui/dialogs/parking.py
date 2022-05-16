@@ -1,6 +1,6 @@
 from copy import copy
 
-from PyQt5.QtWidgets import QListWidgetItem, QVBoxLayout, QListWidget, QPushButton
+from PyQt5.QtWidgets import QListWidgetItem, QVBoxLayout, QLabel
 
 from entities import *
 from ui.dialogs.node import NodeDialog
@@ -39,21 +39,19 @@ class ParkingDialog(NodeDialog):
     def update_node(self):
         super(ParkingDialog, self).update_node()
 
-        for i in range(self.trackW.count()):
-            item = self.trackW.item(i)
-            widget: TrackFiled = self.trackW.itemWidget(item)
-
-            self.node.add_transport(widget.new_track)
+        self.node.clear_transport()
+        for i in range(self.trackW.amount):
+            self.node.add_transport(self.trackW.new_track)
 
     def track_UI(self):
         layout = QVBoxLayout()
 
-        self.trackW = QListWidget(self)
-        layout.addWidget(self.trackW)
+        layout.addWidget(QLabel('Транспорт', self))
 
-        self.add_trackW = QPushButton("Добавить транспорт", self)
-        self.add_trackW.clicked.connect(self.add_new_track)
-        layout.addWidget(self.add_trackW)
+        track_amount = len(self.node.transport)
+        track = self.node.transport[0] if track_amount else Transport()
+        self.trackW = TrackFiled(self, track, track_amount)
+        layout.addWidget(self.trackW)
 
         self.content.addItem(layout)
         return layout
@@ -64,6 +62,3 @@ class ParkingDialog(NodeDialog):
 
     def additional_UI(self):
         self.track_UI()
-        self.fill_tracks()
-        # apply_btn = self.track_UI()
-        # self.content.addWidget(apply_btn)

@@ -11,7 +11,6 @@ from graphics import get_figure
 from ui.dialogs import ParkingDialog, WarehouseDialog, ConsumerDialog, NodeDialog
 from ui.dialogs.route import RouteDialog
 from ui.fields.route import RouteField
-
 from ui.gui import *
 from ui.node_list import ListField, ParkingField, WarehouseField, ConsumerField
 

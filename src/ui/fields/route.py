@@ -1,10 +1,9 @@
-from typing import Callable, Type, Any
+from typing import Callable, Any
 
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy
 
 from entities import Route
-from ui.dialogs.route import RouteDialog
 
 
 class RouteField(QWidget):
