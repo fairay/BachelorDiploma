@@ -17,6 +17,7 @@ def build_graph(sys: TransportSystem) -> nx.Graph:
 
 
 def get_figure(sys: TransportSystem, route: Route = None, node: GeoNode = None) -> plt.Figure:
+    plt.close('all')
     g = build_graph(sys)
     if route:
         for node1, node2 in zip(route.nodes[:-1], route.nodes[1:]):

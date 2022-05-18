@@ -12,12 +12,12 @@ a = 10_000
 
 def init_transport() -> Dict[Transport, int]:
     return {
-        Transport("ГАЗель NEXT", 13.500, 10.0): 1,
+        Transport("ГАЗель NEXT", 13.500, 10.0): 3,
         Transport('Ford Transit', 5.190, 10.0): 0,  # V - 4200-15100
         Transport('ГАЗель Бизнес', 9.000, 10.0): 0,  # V - 9000-11000
 
-        Transport("LADA Largus универсал", 2.350, 10.0): 1,
-        Transport("УАЗ 3909 Комби", 2.693, 10.0): 1,
+        Transport("LADA Largus универсал", 2.350, 10.0): 0,
+        Transport("УАЗ 3909 Комби", 2.693, 10.0): 0,
         Transport('ГАЗ-2752 «Соболь Бизнес»', 6.860, 10.0): 0,
 
         Transport('УАЗ «Профи»', 7.200, 10.0): 0,

@@ -202,7 +202,7 @@ class MainWin(QtWidgets.QMainWindow):
 
     def build_routes(self):
         route_builder = RouteBuilder(self.sys)
-        self.routes = route_builder.routes
+        self.routes = route_builder.calc_routes()
 
         self.clean_routes()
         for r in self.routes:

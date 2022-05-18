@@ -1,7 +1,7 @@
 from copy import copy
-from typing import List
+from typing import List, Set, Dict
 
-from .nodes import Parking, GeoNode
+from .nodes import Parking, GeoNode, Warehouse
 from .product import ProductList
 from .road import Road
 from .transport import Transport
@@ -56,3 +56,34 @@ class Route:
         for node_form, node_to in zip(self.nodes[:-1], self.nodes[1:]):
             roads.append(node_form.linked[node_to])
         return roads
+
+    @property
+    def prod_names(self) -> Set[str]:
+        names: Set[str] = set()
+        for load in self.loads:
+            for prod in load:
+                names.add(prod.name)
+        return names
+
+    @property
+    def warehouse(self) -> Warehouse:
+        for node, load in zip(self.nodes, self.loads):
+            if isinstance(node, Warehouse) and not load.is_empty():
+                return node
+
+    @property
+    def products(self):
+        index = self.nodes.index(self.warehouse)
+        return self.loads[index]
+
+    @property
+    def node_dist(self) -> Dict[GeoNode, float]:
+        dist = 0.0
+        dist_dict = {self.nodes[0]: dist}
+
+        for node_form, node_to in zip(self.nodes[:-1], self.nodes[1:]):
+            road = node_form.linked[node_to]
+            dist += road.dist
+            dist_dict[node_to] = dist
+
+        return dist_dict

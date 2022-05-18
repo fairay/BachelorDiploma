@@ -35,8 +35,12 @@ class RouteBuilder(object):
     stocks: Dict[Warehouse, ProductList]
     orders: Dict[Consumer, ProductList]
 
+    prod_nodes: Dict[str, List[GeoNode]]
+    pot: Dict[str, Dict[GeoNode, float]]
+
     def __init__(self, sys: TransportSystem):
         self.sys = sys
+        self.pot = {}
 
         sys.check_valid()
         self.init_orders()
@@ -73,11 +77,10 @@ class RouteBuilder(object):
     def _estimate_routes(self) -> List[Route]:
         all_routes = self._init_routes()
 
-        transport = copy(self.sys.parking.transport)
-        transport.sort(key=lambda track: track.volume)
+        transport = self.sys.parking.transport
         routes = []
 
-        for r in all_routes:
+        for index, r in enumerate(all_routes):
             c_node: Consumer = r.nodes[-1]
             w_node: Warehouse = r.nodes[-2]
 
@@ -87,16 +90,7 @@ class RouteBuilder(object):
                 continue
 
             cross_products = order * stock
-            cross_volume = cross_products.volume(self.sys.vol)
-            selected_track = None
-            for track in transport:
-                if track.volume >= cross_volume:
-                    selected_track = track
-                    break
-            else:
-                selected_track = transport[-1]
-                cross_products.to_restriction(selected_track.volume, self.sys.vol)
-                all_routes.append(copy(r))
+            selected_track = transport[index % len(transport)]
 
             stock.minus(cross_products)
             order.minus(cross_products)
@@ -108,22 +102,38 @@ class RouteBuilder(object):
         return routes
 
     def _main_routes(self, pre_routes: List[Route]) -> List[Route]:
-        pot: Dict[GeoNode, float] = {}
-        pot[self.sys.parking] = 0
-
-        for w_node in self.sys.warehouses:
-            pot[w_node] = pot[self.sys.parking] + w_node.dist(self.sys.parking)
-
-        for c_node in self.sys.consumers:
-            dist = []
-            for node, road in c_node.linked.items():
-                if isinstance(node, Warehouse):
-                    dist.append(road.dist + pot[node])
-            pot[c_node] = min(dist)
+        self._product_dict()
+        self._calculate_potentials(pre_routes)
 
         return pre_routes
 
-    @property
-    def routes(self) -> List[Route]:
-        routes = self.calc_routes()
-        return routes
+    def _product_dict(self):
+        self.prod_nodes = {}
+
+        for wnode in self.sys.warehouses:
+            for prod in wnode.stock:
+                if prod.name in self.prod_nodes.keys():
+                    self.prod_nodes[prod.name].append(wnode)
+                else:
+                    self.prod_nodes[prod.name] = [wnode]
+
+        for cnode in self.sys.consumers:
+            for prod in cnode.order:
+                if prod.name in self.prod_nodes.keys():
+                    self.prod_nodes[prod.name].append(cnode)
+                else:
+                    self.prod_nodes[prod.name] = [cnode]
+
+    def _calculate_potentials(self, routes: List[Route]):
+        self.pot = {}
+        print(self.pot)
+
+        for prod in self.prod_nodes.keys():
+            self.pot[prod] = {}
+
+        for route in routes:
+            prod_names = route.prod_names
+
+            for node, dist in route.node_dist.items():
+                for prod in prod_names:
+                    self.pot[prod][node] = dist
