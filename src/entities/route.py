@@ -58,6 +58,15 @@ class Route:
         return roads
 
     @property
+    def volume(self) -> float:
+        prod = self.products
+        return len(prod) * prod[0].volume if len(prod) else 0.0
+
+    @property
+    def occupancy(self) -> float:
+        return self.volume / self.track.volume
+
+    @property
     def prod_names(self) -> Set[str]:
         names: Set[str] = set()
         for load in self.loads:
@@ -87,3 +96,21 @@ class Route:
             dist_dict[node_to] = dist
 
         return dist_dict
+
+    def _take_over_same(self, other: 'Route') -> bool:
+        for node, load in zip(other.nodes[::-1], other.loads[::-1]):
+            if node == other.warehouse:
+                return True
+
+            self.nodes.append(node)
+            self.loads.append(load)
+
+            other.nodes.pop()
+            other.loads.pop()
+        return True
+
+    def take_over(self, other: 'Route') -> bool:
+        if self.warehouse == other.warehouse:
+            return self._take_over_same(other)
+        else:
+            pass

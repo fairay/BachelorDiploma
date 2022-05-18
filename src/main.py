@@ -41,7 +41,6 @@ def init_parking() -> Parking:
 
 def init_system():
     tsys = TransportSystem()
-    tsys.vol = 0.2
 
     tsys.add_parking(init_parking())
 
@@ -80,6 +79,6 @@ def main():
 if __name__ == '__main__':
     # tsys = init_system()
     # TransportSystem.Loader.save(tsys, './configs/data.json')
-    route_builder = RouteBuilder(init_system())
-    routes = route_builder.calc_routes()
+    # route_builder = RouteBuilder(init_system())
+    # routes = route_builder.calc_routes()
     main()

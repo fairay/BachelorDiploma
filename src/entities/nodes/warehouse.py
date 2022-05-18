@@ -9,9 +9,8 @@ class Warehouse(GeoNode):
     rest: ProductList
 
     def __init__(self, name="Склад", *stock: Product):
-        super().__init__(name)
+        super(Warehouse, self).__init__(name)
         self.stock = ProductList(stock)
-        self.rest = ProductList()
 
     def __copy__(self) -> 'Warehouse':
         new = Warehouse(self.name, *self.stock)

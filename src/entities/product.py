@@ -4,9 +4,10 @@ from typing import Union, Optional
 class Product:
     __match_args__ = ('name',)
 
-    def __init__(self, name: str, amount: int):
+    def __init__(self, name: str, amount: int, volume=0.1):
         self.name = name
         self.amount = amount
+        self._volume = volume
 
     def __iadd__(self, other: Union['Product', int]):
         match other:
@@ -21,8 +22,9 @@ class Product:
     def __repr__(self) -> str:
         return f'{self.name}: {self.amount}'
 
-    def volume(self, prod_vol: float = 1.0):
-        return self.amount * prod_vol
+    @property
+    def volume(self):
+        return self.amount * self._volume
 
     def split(self, new_amount: int) -> Optional['Product']:
         if new_amount >= self.amount:
@@ -68,8 +70,9 @@ class ProductList(list[Product]):
     def is_empty(self):
         return len(self) == 0
 
-    def volume(self, prod_vol: float = 1.0) -> float:
-        return sum(prod.volume(prod_vol) for prod in self)
+    @property
+    def volume(self) -> float:
+        return sum(prod.volume for prod in self)
 
     def to_restriction(self, volume: float, prod_vol: float = 1.0) -> 'ProductList':
         """
@@ -78,7 +81,7 @@ class ProductList(list[Product]):
         Returns reminder list of products
         """
 
-        if self.volume(prod_vol) <= volume:
+        if self.volume <= volume:
             return ProductList()
 
         rem = ProductList(self)
@@ -87,7 +90,7 @@ class ProductList(list[Product]):
 
         self_vol = 0
         for prod in rem:
-            prod_vol = prod.volume(prod_vol)
+            prod_vol = prod.volume
             if self_vol + prod_vol < volume:
                 self.append(prod)
                 self_vol += prod_vol

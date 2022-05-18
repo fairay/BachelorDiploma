@@ -1,5 +1,5 @@
 from copy import copy
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from .nodes import Warehouse, Consumer, GeoNode
 from .product import ProductList
@@ -27,6 +27,38 @@ def enough_products(stock: ProductList, order: ProductList) -> bool:
     return True
 
 
+class ProductPot(dict[GeoNode, float]):
+    def apply_route(self, route: Route):
+        for node, dist in route.node_dist.items():
+            self[node] = min(self.get(node, dist), dist)
+
+
+class ProductDisc(List[Tuple[float, GeoNode, GeoNode]]):
+    # potential, from, to
+
+    def __init__(self, prod: str, pot: ProductPot, routes: List[Route]):
+        super(ProductDisc, self).__init__()
+
+        self.prod = prod
+        self.pot = pot
+
+        for node in pot.keys():
+            self._process_node(node)
+
+        del self.pot
+
+    def _process_node(self, node: GeoNode):
+        if not isinstance(node, Consumer):
+            return
+
+        node_pot = self.pot[node]
+        for other in node.linked:
+            dist = node.dist(other)
+            delta = -node_pot + dist
+            if delta < 0:
+                self.append((delta, other, node))
+
+
 class RouteBuilder(object):
     sys: TransportSystem
     all_stocks: ProductList
@@ -36,11 +68,9 @@ class RouteBuilder(object):
     orders: Dict[Consumer, ProductList]
 
     prod_nodes: Dict[str, List[GeoNode]]
-    pot: Dict[str, Dict[GeoNode, float]]
 
     def __init__(self, sys: TransportSystem):
         self.sys = sys
-        self.pot = {}
 
         sys.check_valid()
         self.init_orders()
@@ -56,6 +86,7 @@ class RouteBuilder(object):
 
     def calc_routes(self) -> List[Route]:
         routes = self._estimate_routes()
+        self.sys.init_balance(routes)
         routes = self._main_routes(routes)
 
         return routes
@@ -101,9 +132,36 @@ class RouteBuilder(object):
 
         return routes
 
+    def _optimization_iteration(self, pre_routes: List[Route]) -> bool:
+        pot = self._calculate_potentials(pre_routes)
+        disc = self._calculate_discrepancy(pot, pre_routes)
+        merged_disc = self._merge_discrepancy(disc)
+
+        for d in merged_disc:
+            local_disc, from_node, to_node = d
+
+            from_routes: List[Route] = sorted(filter(lambda r: r.nodes[-1] == from_node, pre_routes),
+                                              key=lambda r: r.occupancy)
+            to_routes: List[Route] = sorted(filter(lambda r: r.nodes[-1] == to_node, pre_routes),
+                                            key=lambda r: r.occupancy)
+
+            for route in to_routes:
+                for alt_route in from_routes:
+                    if route.occupancy > 1 - alt_route.occupancy:
+                        continue  # not enough space
+                    if route.warehouse == alt_route.warehouse:
+                        if alt_route.take_over(route):
+                            pre_routes.remove(route)
+                            return True
+
+        return False
+
     def _main_routes(self, pre_routes: List[Route]) -> List[Route]:
         self._product_dict()
-        self._calculate_potentials(pre_routes)
+
+        upd = self._optimization_iteration(pre_routes)
+        while upd:
+            upd = self._optimization_iteration(pre_routes)
 
         return pre_routes
 
@@ -124,16 +182,23 @@ class RouteBuilder(object):
                 else:
                     self.prod_nodes[prod.name] = [cnode]
 
-    def _calculate_potentials(self, routes: List[Route]):
-        self.pot = {}
-        print(self.pot)
-
-        for prod in self.prod_nodes.keys():
-            self.pot[prod] = {}
+    def _calculate_potentials(self, routes: List[Route]) -> Dict[str, ProductPot]:
+        pot = {prod: ProductPot() for prod in self.prod_nodes.keys()}
 
         for route in routes:
-            prod_names = route.prod_names
+            for prod in route.prod_names:
+                pot[prod].apply_route(route)
 
-            for node, dist in route.node_dist.items():
-                for prod in prod_names:
-                    self.pot[prod][node] = dist
+        return pot
+
+    def _calculate_discrepancy(self, pot: Dict[str, ProductPot], routes: List[Route]) -> Dict[str, ProductDisc]:
+        disc: Dict[str, ProductDisc] = {prod: ProductDisc(prod, prod_pot, routes) for prod, prod_pot in pot.items()}
+        return disc
+
+    def _merge_discrepancy(self, disc: Dict[str, ProductDisc]) -> List[Tuple[float, GeoNode, GeoNode]]:
+        merged_disc = []
+        for prod, prod_disc in disc.items():
+            merged_disc += prod_disc
+
+        merged_disc.sort(key=lambda x: x[0])
+        return merged_disc

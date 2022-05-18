@@ -18,8 +18,8 @@ class TransportSystem(object):
         self.warehouses: List[Warehouse] = []
         self.consumers: List[Consumer] = []
 
-        self.vol: float = 1.0
         self.con: float = 1.0
+        self.vol = 0.1
 
     def save_json(self, file: TextIO):
         jsonpickle.set_preferred_backend('json')
@@ -34,6 +34,24 @@ class TransportSystem(object):
         data = jsonpickle.decode(file.read(), keys=True)
 
         return data
+
+    def init_balance(self, routes: List[Route] = None):
+        for wnode in self.warehouses:
+            for prod in wnode.stock:
+                wnode.balance[prod.name] = prod.amount
+
+        for cnode in self.consumers:
+            for prod in cnode.order:
+                cnode.balance[prod.name] = -prod.amount
+
+        if not routes:
+            return
+
+        for route in routes:
+            for node, load in zip(route.nodes, route.loads):
+                mult = -1 if isinstance(node, Warehouse) else 1
+                for prod in load:
+                    node.balance[prod.name] += mult * prod.volume
 
     def check_valid(self) -> None:
         if self.parking is None:

@@ -8,6 +8,7 @@ class GeoNode(object):
     def __init__(self, name=""):
         self.name: str = name
         self.linked: Dict[GeoNode, Road] = {}
+        self.balance: Dict[str, int] = {}
 
     def __str__(self):
         return self.name

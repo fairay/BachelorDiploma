@@ -35,7 +35,7 @@ class WarehouseDialog(NodeDialog):
         self.productW.setItemWidget(item, widget)
 
     def add_new_product(self):
-        self.add_product(Product("без имени", 1))
+        self.add_product(Product("без имени", 1, self.sys.vol))
 
     def update_node(self):
         super(WarehouseDialog, self).update_node()

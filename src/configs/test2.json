@@ -1,0 +1,63 @@
+{
+  "py/object": "entities.system.TransportSystem",
+  "transport": [
+    {
+      "py/object": "entities.transport.Transport",
+      "name": "ГАЗель NEXT",
+      "volume": 13.5
+    },
+    {
+      "py/object": "entities.transport.Transport",
+      "name": "ГАЗель NEXT",
+      "volume": 13.5
+    },
+    {
+      "py/object": "entities.transport.Transport",
+      "name": "ГАЗель NEXT",
+      "volume": 13.5
+    }
+  ],
+  "routes": [],
+  "parking": {
+    "py/object": "entities.nodes.parking.Parking",
+    "name": "Стоянка",
+    "linked": {
+      "json://{\"py/object\": \"entities.nodes.warehouse.Warehouse\", \"name\": \"Склад №1\", \"linked\": {\"json://{\\\"py/id\\\": 6}\": {\"py/object\": \"entities.road.Road\", \"dist\": 1.0, \"time\": 1.0}, \"json://{\\\"py/object\\\": \\\"entities.nodes.consumer.Consumer\\\", \\\"name\\\": \\\"Потребитель №1\\\", \\\"linked\\\": {\\\"json://{\\\\\\\"py/id\\\\\\\": 8}\\\": {\\\"py/object\\\": \\\"entities.road.Road\\\", \\\"dist\\\": 1.0, \\\"time\\\": 1.0}, \\\"json://{\\\\\\\"py/object\\\\\\\": \\\\\\\"entities.nodes.consumer.Consumer\\\\\\\", \\\\\\\"name\\\\\\\": \\\\\\\"Потребитель №2\\\\\\\", \\\\\\\"linked\\\\\\\": {\\\\\\\"json://{\\\\\\\\\\\\\\\"py/id\\\\\\\\\\\\\\\": 8}\\\\\\\": {\\\\\\\"py/object\\\\\\\": \\\\\\\"entities.road.Road\\\\\\\", \\\\\\\"dist\\\\\\\": 1.0, \\\\\\\"time\\\\\\\": 1.0}, \\\\\\\"json://{\\\\\\\\\\\\\\\"py/id\\\\\\\\\\\\\\\": 11}\\\\\\\": {\\\\\\\"py/object\\\\\\\": \\\\\\\"entities.road.Road\\\\\\\", \\\\\\\"dist\\\\\\\": 1.0, \\\\\\\"time\\\\\\\": 1.0}}, \\\\\\\"balance\\\\\\\": {}, \\\\\\\"order\\\\\\\": {\\\\\\\"py/object\\\\\\\": \\\\\\\"entities.product.ProductList\\\\\\\", \\\\\\\"py/seq\\\\\\\": [{\\\\\\\"py/object\\\\\\\": \\\\\\\"entities.product.Product\\\\\\\", \\\\\\\"name\\\\\\\": \\\\\\\"шоколад\\\\\\\", \\\\\\\"amount\\\\\\\": 14, \\\\\\\"_volume\\\\\\\": 0.1}]}}\\\": {\\\"py/id\\\": 17}}, \\\"balance\\\": {}, \\\"order\\\": {\\\"py/object\\\": \\\"entities.product.ProductList\\\", \\\"py/seq\\\": [{\\\"py/object\\\": \\\"entities.product.Product\\\", \\\"name\\\": \\\"шоколад\\\", \\\"amount\\\": 14, \\\"_volume\\\": 0.1}]}}\": {\"py/id\": 13}, \"json://{\\\"py/id\\\": 14}\": {\"py/id\": 16}}, \"balance\": {}, \"stock\": {\"py/object\": \"entities.product.ProductList\", \"py/seq\": [{\"py/object\": \"entities.product.Product\", \"name\": \"шоколад\", \"amount\": 30, \"_volume\": 0.1}]}}": {
+        "py/id": 10
+      }
+    },
+    "balance": {},
+    "transport": [
+      {
+        "py/object": "entities.transport.Transport",
+        "name": "ГАЗель NEXT",
+        "volume": 1.0
+      },
+      {
+        "py/object": "entities.transport.Transport",
+        "name": "ГАЗель NEXT",
+        "volume": 1.0
+      },
+      {
+        "py/object": "entities.transport.Transport",
+        "name": "ГАЗель NEXT",
+        "volume": 1.0
+      }
+    ]
+  },
+  "warehouses": [
+    {
+      "py/id": 8
+    }
+  ],
+  "consumers": [
+    {
+      "py/id": 11
+    },
+    {
+      "py/id": 14
+    }
+  ],
+  "con": 1.0,
+  "vol": 0.1
+}

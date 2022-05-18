@@ -11,7 +11,6 @@ class Consumer(GeoNode):
     def __init__(self, name='Потребитель', *order: Product):
         super().__init__(name)
         self.order = ProductList(order)
-        self.rest = ProductList()
 
     def __copy__(self) -> 'Consumer':
         new = Consumer(self.name, *self.order)
