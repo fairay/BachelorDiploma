@@ -7,7 +7,7 @@ class Product:
     def __init__(self, name: str, amount: int, volume=0.1):
         self.name = name
         self.amount = amount
-        self._volume = volume
+        self.volume = volume
 
     def __iadd__(self, other: Union['Product', int]):
         match other:
@@ -23,19 +23,19 @@ class Product:
         return f'{self.name}: {self.amount}'
 
     @property
-    def volume(self):
-        return self.amount * self._volume
+    def sum_volume(self):
+        return self.amount * self.volume
 
     def split(self, new_amount: int) -> Optional['Product']:
         if new_amount >= self.amount:
             return None
 
-        rem = Product(self.name, self.amount - new_amount)
-        self.amount -= new_amount
+        rem = Product(self.name, self.amount - new_amount, self.volume)
+        self.amount = new_amount
         return rem
 
-    def to_restriction(self, volume: float, prod_vol: float = 1.0) -> Optional['Product']:
-        new_amount = int(volume / prod_vol)
+    def to_restriction(self, volume: float) -> Optional['Product']:
+        new_amount = int(volume / self.volume + 1e-4)
         return self.split(new_amount)
 
 
@@ -72,15 +72,20 @@ class ProductList(list[Product]):
 
     @property
     def volume(self) -> float:
-        return sum(prod.volume for prod in self)
+        return sum(prod.sum_volume for prod in self)
 
-    def to_restriction(self, volume: float, prod_vol: float = 1.0) -> 'ProductList':
+    @property
+    def amount(self) -> int:
+        return sum(prod.amount for prod in self)
+
+    def to_restriction(self, volume: float) -> 'ProductList':
         """
         Restricts list to fit given volume
 
         Returns reminder list of products
         """
 
+        amount = int(volume / self[0].volume + 1e-4)
         if self.volume <= volume:
             return ProductList()
 
@@ -88,16 +93,17 @@ class ProductList(list[Product]):
         rem.sort(key=lambda prod: prod.amount, reverse=True)
         self.clear()
 
-        self_vol = 0
+        self_amount = 0
         for prod in rem:
-            prod_vol = prod.volume
-            if self_vol + prod_vol < volume:
+            prod_amount = prod.amount
+            if self_amount + prod_amount < volume:
                 self.append(prod)
-                self_vol += prod_vol
+                self_amount += prod_amount
+
         rem.minus(self)
 
-        if self_vol < volume * 0.99:
-            prod = rem[0].to_restriction(volume - self_vol, prod_vol)
+        if self.volume < volume:
+            prod = rem[0].split(amount - self_amount)
             self.append(rem[0])
             rem[0] = prod
 

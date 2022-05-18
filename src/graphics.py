@@ -19,9 +19,6 @@ def build_graph(sys: TransportSystem) -> nx.Graph:
 def get_figure(sys: TransportSystem, route: Route = None, node: GeoNode = None) -> plt.Figure:
     plt.close('all')
     g = build_graph(sys)
-    if route:
-        for node1, node2 in zip(route.nodes[:-1], route.nodes[1:]):
-            g[node1.name][node2.name]['color'] = 'red'
 
     pos = nx.spring_layout(g, seed=10)
 
@@ -30,10 +27,12 @@ def get_figure(sys: TransportSystem, route: Route = None, node: GeoNode = None) 
     subp.margins(0.2)
     subp.set_position([0, 0, 1, 1])
 
-    active_edges = [(u, v) for u, v in g.edges if 'color' in g[u][v]]
     nx.draw_networkx_edges(g, pos, ax=subp)
-    nx.draw_networkx_edges(g, pos, ax=subp, edgelist=active_edges, edge_color=colors['accent3'], width=1,
-                           arrowstyle=ArrowStyle('Simple', head_length=2.0, head_width=1.0), arrows=True, arrowsize=20)
+    if route:
+        active_edges = [(u.name, v.name) for u, v in zip(route.nodes[:-1], route.nodes[1:])]
+        nx.draw_networkx_edges(g, pos, ax=subp, edgelist=active_edges, edge_color=colors['accent3'], width=1,
+                               arrowstyle=ArrowStyle('Simple', head_length=2.0, head_width=1.0), arrows=True,
+                               arrowsize=20)
 
     labels = {n: n for n in g}
     if node:

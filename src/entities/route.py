@@ -1,6 +1,7 @@
 from copy import copy
 from typing import List, Set, Dict
 
+from . import Consumer
 from .nodes import Parking, GeoNode, Warehouse
 from .product import ProductList
 from .road import Road
@@ -30,7 +31,7 @@ class Route:
         return s
 
     def add_node(self, node: GeoNode):
-        if self.nodes[-1].is_linked(node):
+        if self.tail.is_linked(node):
             self.nodes.append(node)
             self.loads.append(ProductList())
         else:
@@ -59,8 +60,7 @@ class Route:
 
     @property
     def volume(self) -> float:
-        prod = self.products
-        return len(prod) * prod[0].volume if len(prod) else 0.0
+        return sum(prod.sum_volume for prod in self.products)
 
     @property
     def occupancy(self) -> float:
@@ -76,8 +76,21 @@ class Route:
 
     @property
     def warehouse(self) -> Warehouse:
+        return self.find_warehouse(empty_route=False)
+
+    def find_warehouse(self, empty_route=False):
         for node, load in zip(self.nodes, self.loads):
-            if isinstance(node, Warehouse) and not load.is_empty():
+            if isinstance(node, Warehouse) and (not load.is_empty() or empty_route):
+                return node
+
+    @property
+    def tail(self) -> GeoNode:
+        return self.nodes[-1]
+
+    @property
+    def ctail(self) -> Consumer:
+        for node in self.nodes[::-1]:
+            if isinstance(node, Consumer):
                 return node
 
     @property

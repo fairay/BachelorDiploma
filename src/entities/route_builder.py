@@ -112,8 +112,8 @@ class RouteBuilder(object):
         routes = []
 
         for index, r in enumerate(all_routes):
-            c_node: Consumer = r.nodes[-1]
-            w_node: Warehouse = r.nodes[-2]
+            c_node: Consumer = r.ctail
+            w_node: Warehouse = r.find_warehouse(empty_route=True)
 
             stock = self.stocks[w_node]
             order = self.orders[c_node]
@@ -122,6 +122,9 @@ class RouteBuilder(object):
 
             cross_products = order * stock
             selected_track = transport[index % len(transport)]
+            if cross_products.volume >= selected_track.volume:
+                cross_products.to_restriction(selected_track.volume)
+                all_routes.append(copy(r))
 
             stock.minus(cross_products)
             order.minus(cross_products)
@@ -140,9 +143,10 @@ class RouteBuilder(object):
         for d in merged_disc:
             local_disc, from_node, to_node = d
 
-            from_routes: List[Route] = sorted(filter(lambda r: r.nodes[-1] == from_node, pre_routes),
+            from_routes: List[Route] = sorted(filter(lambda r: r.tail == from_node, pre_routes),
                                               key=lambda r: r.occupancy)
-            to_routes: List[Route] = sorted(filter(lambda r: r.nodes[-1] == to_node, pre_routes),
+
+            to_routes: List[Route] = sorted(filter(lambda r: r.tail == to_node, pre_routes),
                                             key=lambda r: r.occupancy)
 
             for route in to_routes:

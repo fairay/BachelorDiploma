@@ -51,7 +51,7 @@ class TransportSystem(object):
             for node, load in zip(route.nodes, route.loads):
                 mult = -1 if isinstance(node, Warehouse) else 1
                 for prod in load:
-                    node.balance[prod.name] += mult * prod.volume
+                    node.balance[prod.name] += mult * prod.sum_volume
 
     def check_valid(self) -> None:
         if self.parking is None:
