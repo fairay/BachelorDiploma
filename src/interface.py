@@ -119,6 +119,8 @@ class MainWin(QtWidgets.QMainWindow):
         self.render_ui()
 
     def import_sys(self, file_name: str):
+        self.clean_list()
+        self.clean_routes()
         self.sys = TransportSystem.Loader.load(file_name)
         self.sys_file = file_name
 

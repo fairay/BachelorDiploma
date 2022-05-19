@@ -16,6 +16,7 @@ def small_sys() -> TransportSystem:
     tsys.add_transport(Transport('ГАЗель NEXT', 1.0))
     return tsys
 
+
 class MyTestCase(unittest.TestCase):
     def test_1(self):
         tsys = TransportSystem.Loader.load('./configs/test1.json')
@@ -32,6 +33,23 @@ class MyTestCase(unittest.TestCase):
         routes = route_builder.calc_routes()
 
         self.assertEqual(len(routes), 3)
+
+    def test_3(self):
+        tsys = TransportSystem.Loader.load('./configs/test3.json')
+
+        route_builder = RouteBuilder(tsys)
+        routes = route_builder.calc_routes()
+
+        self.assertEqual(len(routes), 1)
+
+    def test_4(self):
+        tsys = TransportSystem.Loader.load('./configs/test4.json')
+
+        route_builder = RouteBuilder(tsys)
+        routes = route_builder.calc_routes()
+
+        self.assertEqual(len(routes), 2)
+
 
 if __name__ == '__main__':
     unittest.main()

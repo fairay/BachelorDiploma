@@ -3,6 +3,7 @@ from typing import List, Dict, Tuple
 
 from .nodes import Warehouse, Consumer, GeoNode
 from .product import ProductList
+from .road_map import RoadMap
 from .route import Route
 from .system import TransportSystem
 
@@ -61,6 +62,7 @@ class ProductDisc(List[Tuple[float, GeoNode, GeoNode]]):
 
 class RouteBuilder(object):
     sys: TransportSystem
+    road_map: RoadMap
     all_stocks: ProductList
     all_orders: ProductList
 
@@ -71,6 +73,7 @@ class RouteBuilder(object):
 
     def __init__(self, sys: TransportSystem):
         self.sys = sys
+        self.road_map = RoadMap(sys)
 
         sys.check_valid()
         self.init_orders()
@@ -87,7 +90,10 @@ class RouteBuilder(object):
     def calc_routes(self) -> List[Route]:
         routes = self._estimate_routes()
         self.sys.init_balance(routes)
+
         routes = self._main_routes(routes)
+
+        routes = self._close_routes(routes)
 
         return routes
 
@@ -206,3 +212,12 @@ class RouteBuilder(object):
 
         merged_disc.sort(key=lambda x: x[0])
         return merged_disc
+
+    def _close_routes(self, routes: List[Route]) -> List[Route]:
+        self.road_map.find_routes(self.sys.parking)
+
+        for route in routes:
+            route_back = self.road_map.route(route.tail, self.sys.parking)
+            route.prolong(route_back)
+
+        return routes

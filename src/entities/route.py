@@ -1,8 +1,8 @@
 from copy import copy, deepcopy
 from typing import List, Set, Dict
 
-from . import Consumer
-from .nodes import Parking, GeoNode, Warehouse
+from . import Consumer, LinkedRoad
+from .nodes import GeoNode, Warehouse
 from .product import ProductList
 from .road import Road
 from .transport import Transport
@@ -13,9 +13,9 @@ class Route:
     track: Transport | None
     loads: List[ProductList]
 
-    def __init__(self, parking: Parking, *nodes: GeoNode):
+    def __init__(self, node: GeoNode, *nodes: GeoNode):
         self.track = None
-        self.nodes = [parking]
+        self.nodes = [node]
         self.loads = [ProductList()]
 
         for node in nodes:
@@ -44,6 +44,22 @@ class Route:
         i = self.nodes.index(node)
         self.loads[i] = load
 
+    def extend(self, node: GeoNode) -> 'Route':
+        new = copy(self)
+        new.add_node(node)
+        return new
+
+    def prolong(self, other: 'Route'):
+        offset = 1 if self.tail == other.head else 0
+        self.nodes += other.nodes[offset:]
+        self.loads += other.loads[offset:]
+
+    def inverse(self) -> 'Route':
+        new = copy(self)
+        new.nodes = new.nodes[::-1]
+        new.loads = new.loads[::-1]
+        return new
+
     @property
     def dist(self) -> float:
         d = 0.0
@@ -56,6 +72,30 @@ class Route:
         roads = []
         for node_form, node_to in zip(self.nodes[:-1], self.nodes[1:]):
             roads.append(node_form.linked[node_to])
+        return roads
+
+    @property
+    def roads_forward(self) -> List[LinkedRoad]:
+        last_forward = self.last_delivery
+        index = self.nodes.index(last_forward)
+        roads: List[LinkedRoad] = []
+        for from_node, to_node in zip(self.nodes[:index], self.nodes[1:index + 1]):
+            if from_node == last_forward:
+                break
+            road = from_node.linked[to_node]
+            roads.append(LinkedRoad(from_node, to_node, road.dist, road.time))
+
+        return roads
+
+    @property
+    def roads_backward(self) -> List[LinkedRoad]:
+        last_forward = self.last_delivery
+        index = self.nodes.index(last_forward)
+        roads: List[LinkedRoad] = []
+        for from_node, to_node in zip(self.nodes[index:-1], self.nodes[index + 1:]):
+            road = from_node.linked[to_node]
+            roads.append(LinkedRoad(from_node, to_node, road.dist, road.time))
+
         return roads
 
     @property
@@ -78,10 +118,19 @@ class Route:
     def warehouse(self) -> Warehouse:
         return self.find_warehouse(empty_route=False)
 
+    @property
+    def last_delivery(self) -> GeoNode:
+        for node, load in zip(reversed(self.nodes), reversed(self.loads)):
+            if load: return node
+
     def find_warehouse(self, empty_route=False):
         for node, load in zip(self.nodes, self.loads):
             if isinstance(node, Warehouse) and (not load.is_empty() or empty_route):
                 return node
+
+    @property
+    def head(self) -> GeoNode:
+        return self.nodes[0]
 
     @property
     def tail(self) -> GeoNode:

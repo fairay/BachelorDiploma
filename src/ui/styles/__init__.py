@@ -8,7 +8,8 @@ colors = {
     'accent2': '#4F6675',
     'accent3': '#153f65',
     'add1': '#9C4E05',
-    'add2': '#BF7F43'
+    'add2': '#BF7F43',
+    'salmon': '#ff8c69'
 }
 
 stylesheet = f"""
