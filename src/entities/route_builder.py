@@ -1,4 +1,4 @@
-from copy import copy
+from copy import copy, deepcopy
 from typing import List, Dict, Tuple
 
 from .nodes import Warehouse, Consumer, GeoNode
@@ -129,8 +129,8 @@ class RouteBuilder(object):
             stock.minus(cross_products)
             order.minus(cross_products)
             r.set_track(selected_track)
-            r.set_load(w_node, cross_products)
-            r.set_load(c_node, cross_products)
+            r.set_load(w_node, deepcopy(cross_products))
+            r.set_load(c_node, deepcopy(cross_products))
             routes.append(r)
 
         return routes
@@ -140,8 +140,7 @@ class RouteBuilder(object):
         disc = self._calculate_discrepancy(pot, pre_routes)
         merged_disc = self._merge_discrepancy(disc)
 
-        for d in merged_disc:
-            local_disc, from_node, to_node = d
+        for local_disc, from_node, to_node in merged_disc:
 
             from_routes: List[Route] = sorted(filter(lambda r: r.tail == from_node, pre_routes),
                                               key=lambda r: r.occupancy)
@@ -154,6 +153,7 @@ class RouteBuilder(object):
                     if route.occupancy > 1 - alt_route.occupancy:
                         continue  # not enough space
                     if route.warehouse == alt_route.warehouse:
+                        # enough space & same warehouse
                         if alt_route.take_over(route):
                             pre_routes.remove(route)
                             return True

@@ -11,7 +11,6 @@ from entities.transport import Transport
 
 class TransportSystem(object):
     def __init__(self):
-        self.transport: List[Transport] = []
         self.routes: List[Route] = []
 
         self.parking: Optional[Parking] = None
@@ -56,6 +55,8 @@ class TransportSystem(object):
     def check_valid(self) -> None:
         if self.parking is None:
             raise Exception("No parking")
+        elif not self.transport:
+            raise Exception("No transport")
 
         for w_node in self.warehouses:
             if self.parking not in w_node.linked.keys():
@@ -78,10 +79,9 @@ class TransportSystem(object):
 
     def add_parking(self, node: Parking):
         self.parking = node
-        self.transport = self.parking.transport
 
     def add_transport(self, truck: Transport):
-        self.transport.append(truck)
+        self.parking.add_transport(truck)
 
     def add_link(self, ind1: int, ind2: int, dist=1.0, time=1.0):
         if max(ind1, ind2) >= len(self.nodes) or min(ind1, ind2) < 0 or ind1 == ind2:
@@ -97,7 +97,8 @@ class TransportSystem(object):
             self.nodes
         ))
 
-    def _get_nodes(self) -> List[GeoNode]:
+    @property
+    def nodes(self) -> List[GeoNode]:
         res = [self.parking] if self.parking is not None else []
         res += self.warehouses
         res += self.consumers
@@ -125,7 +126,9 @@ class TransportSystem(object):
         else:
             raise Exception('Unexpected type')
 
-    nodes = property(_get_nodes)
+    @property
+    def transport(self) -> List[Transport]:
+        return self.parking.transport
 
     class Loader:
         @staticmethod

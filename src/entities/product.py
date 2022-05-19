@@ -1,3 +1,4 @@
+from copy import copy
 from typing import Union, Optional
 
 
@@ -21,6 +22,9 @@ class Product:
 
     def __repr__(self) -> str:
         return f'{self.name}: {self.amount}'
+
+    def __copy__(self):
+        return Product(self.name, self.amount, self.volume)
 
     @property
     def sum_volume(self):
@@ -66,6 +70,14 @@ class ProductList(list[Product]):
                 self.remove(self_prod)
             else:
                 self_prod.amount -= product.amount
+
+    def add(self, other: 'ProductList'):
+        for product in other:
+            self_prod = self.by_name(product.name)
+            if self_prod is None:
+                self.append(copy(product))
+            else:
+                self_prod.amount += product.amount
 
     def is_empty(self):
         return len(self) == 0

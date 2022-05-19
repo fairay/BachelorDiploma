@@ -1,4 +1,4 @@
-from copy import copy
+from copy import copy, deepcopy
 from typing import List, Set, Dict
 
 from . import Consumer
@@ -23,7 +23,7 @@ class Route:
 
     def __copy__(self) -> 'Route':
         new_route = Route(*self.nodes)
-        new_route.loads = copy(self.loads)
+        new_route.loads = deepcopy(self.loads)
         return new_route
 
     def __repr__(self) -> str:
@@ -111,12 +111,14 @@ class Route:
         return dist_dict
 
     def _take_over_same(self, other: 'Route') -> bool:
+        warehouse_index = self.nodes.index(self.warehouse)
         for node, load in zip(other.nodes[::-1], other.loads[::-1]):
             if node == other.warehouse:
                 return True
 
             self.nodes.append(node)
             self.loads.append(load)
+            self.loads[warehouse_index].add(load)
 
             other.nodes.pop()
             other.loads.pop()

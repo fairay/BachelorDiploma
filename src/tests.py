@@ -1,7 +1,20 @@
 import unittest
 
-from entities import TransportSystem, RouteBuilder
+from entities import TransportSystem, RouteBuilder, Parking, Warehouse, Product, Consumer, Road, Transport
 
+
+def small_sys() -> TransportSystem:
+    tsys = TransportSystem()
+    tsys.vol = 0.1
+    tsys.add_parking(Parking('Стоянка'))
+    tsys.add_warehouse(Warehouse('Склад №1', Product('шоколад', 10, tsys.vol)), Road())
+    tsys.add_consumer(Consumer('Магазин №1', Product('шоколад', 4, tsys.vol)))
+    tsys.add_consumer(Consumer('Магазин №2', Product('шоколад', 4, tsys.vol)))
+    tsys.add_link(1, 2)
+    tsys.add_link(1, 3)
+    tsys.add_link(2, 3)
+    tsys.add_transport(Transport('ГАЗель NEXT', 1.0))
+    return tsys
 
 class MyTestCase(unittest.TestCase):
     def test_1(self):
