@@ -50,6 +50,14 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(len(routes), 2)
 
+    def test_5(self):
+        tsys = TransportSystem.Loader.load('./configs/test5.json')
+
+        route_builder = RouteBuilder(tsys)
+        routes = route_builder.calc_routes()
+
+        self.assertEqual(len(routes), 2)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -24,6 +24,7 @@ class Route:
     def __copy__(self) -> 'Route':
         new_route = Route(*self.nodes)
         new_route.loads = deepcopy(self.loads)
+        new_route.track = self.track
         return new_route
 
     def __repr__(self) -> str:
@@ -68,6 +69,10 @@ class Route:
         return d
 
     @property
+    def cost(self) -> float:
+        return self.dist
+
+    @property
     def roads(self) -> List[Road]:
         roads = []
         for node_form, node_to in zip(self.nodes[:-1], self.nodes[1:]):
@@ -103,8 +108,25 @@ class Route:
         return sum(prod.sum_volume for prod in self.products)
 
     @property
+    def free_volume(self) -> float:
+        return self.track.volume - self.volume
+
+    @property
     def occupancy(self) -> float:
         return self.volume / self.track.volume
+
+    @property
+    def free_space(self) -> int:
+        prod = self.products
+        if not prod: return -1
+        return max(0, int((self.track.volume - self.volume) / prod[0].volume + 1e-5))
+
+    @property
+    def is_full(self) -> bool:
+        return self.free_space == 0
+        prod = self.products
+        if not prod: return False
+        return self.volume + prod[0].volume >= self.track.volume + 1e-5
 
     @property
     def prod_names(self) -> Set[str]:
@@ -143,7 +165,7 @@ class Route:
                 return node
 
     @property
-    def products(self):
+    def products(self) -> ProductList:
         index = self.nodes.index(self.warehouse)
         return self.loads[index]
 
@@ -161,16 +183,28 @@ class Route:
 
     def _take_over_same(self, other: 'Route') -> bool:
         warehouse_index = self.nodes.index(self.warehouse)
+        free = self.free_space
+
         for node, load in zip(other.nodes[::-1], other.loads[::-1]):
             if node == other.warehouse:
                 return True
 
-            self.nodes.append(node)
-            self.loads.append(load)
-            self.loads[warehouse_index].add(load)
+            if load.amount <= free:
+                self.nodes.append(node)
+                self.loads.append(load)
+                self.loads[warehouse_index].add(load)
 
-            other.nodes.pop()
-            other.loads.pop()
+                other.nodes.pop()
+                other.loads.pop()
+            else:
+                rem_load = load.to_restriction(self.free_volume)
+                self.nodes.append(node)
+                self.loads.append(load)
+                self.loads[warehouse_index].add(load)
+
+                other.loads[-1] = rem_load
+                return False
+
         return True
 
     def take_over(self, other: 'Route') -> bool:
@@ -178,3 +212,43 @@ class Route:
             return self._take_over_same(other)
         else:
             pass
+
+    def rollback(self, other: 'Route'):
+        self.nodes = other.nodes
+        self.loads = other.loads
+        self.track = other.track
+
+
+class RouteList(list[Route]):
+    def __copy__(self) -> 'RouteList':
+        new = RouteList()
+        for route in self:
+            new.append(copy(route))
+        return new
+
+    @property
+    def blank_routes(self) -> 'RouteList':
+        return RouteList(filter(lambda r: not r.is_full, self))
+
+    @property
+    def sort_occupancy(self) -> 'RouteList':
+        return RouteList(sorted(self, key=lambda r: r.occupancy))
+
+    @property
+    def cost(self) -> float:
+        return sum(route.cost for route in self)
+
+    @property
+    def snapshot(self) -> Dict[Route, Route]:
+        old_new: Dict[Route, Route] = {}
+        for route in self:
+            old_new[route] = copy(route)
+        return old_new
+
+    def by_tail(self, tail: GeoNode) -> 'RouteList':
+        return RouteList(filter(lambda r: r.tail == tail, self))
+
+    def rollback(self, snapshot: Dict[Route, Route]):
+        for route in self:
+            if route in snapshot:
+                route.rollback(snapshot[route])

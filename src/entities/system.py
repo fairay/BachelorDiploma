@@ -1,11 +1,12 @@
-from typing import List, Optional, Union, TextIO
+from copy import copy
+from typing import List, Optional, Union, TextIO, Dict
 
 import jsonpickle
 
 from entities.nodes import Warehouse, Parking, Consumer
 from entities.nodes.geonode import GeoNode
 from entities.road import Road
-from entities.route import Route
+from entities.route import Route, RouteList
 from entities.transport import Transport
 
 
@@ -34,7 +35,7 @@ class TransportSystem(object):
 
         return data
 
-    def init_balance(self, routes: List[Route] = None):
+    def init_balance(self, routes: RouteList = None):
         for wnode in self.warehouses:
             for prod in wnode.stock:
                 wnode.balance[prod.name] = prod.amount
@@ -50,7 +51,7 @@ class TransportSystem(object):
             for node, load in zip(route.nodes, route.loads):
                 mult = -1 if isinstance(node, Warehouse) else 1
                 for prod in load:
-                    node.balance[prod.name] += mult * prod.sum_volume
+                    node.balance[prod.name] += mult * prod.amount
 
     def check_valid(self) -> None:
         if self.parking is None:
@@ -97,13 +98,6 @@ class TransportSystem(object):
             self.nodes
         ))
 
-    @property
-    def nodes(self) -> List[GeoNode]:
-        res = [self.parking] if self.parking is not None else []
-        res += self.warehouses
-        res += self.consumers
-        return res
-
     def del_node(self, key: GeoNode):
         if key == self.parking:
             self.parking = None
@@ -129,6 +123,24 @@ class TransportSystem(object):
     @property
     def transport(self) -> List[Transport]:
         return self.parking.transport
+
+    @property
+    def nodes(self) -> List[GeoNode]:
+        res = [self.parking] if self.parking is not None else []
+        res += self.warehouses
+        res += self.consumers
+        return res
+
+    @property
+    def balance_snapshot(self) -> Dict[GeoNode, Dict[str, int]]:
+        snapshot: Dict[GeoNode, Dict[str, int]] = {}
+        for node in self.nodes:
+            snapshot[node] = copy(node.balance)
+        return snapshot
+
+    def balance_rollback(self, snapshot: Dict[GeoNode, Dict[str, int]]):
+        for node in self.nodes:
+            node.balance = snapshot[node]
 
     class Loader:
         @staticmethod

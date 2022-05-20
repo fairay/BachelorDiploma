@@ -1,11 +1,14 @@
+from collections import defaultdict
 from copy import copy, deepcopy
 from typing import List, Dict, Tuple
 
 from .nodes import Warehouse, Consumer, GeoNode
 from .product import ProductList
 from .road_map import RoadMap
-from .route import Route
+from .route import Route, RouteList
 from .system import TransportSystem
+
+MAX_ITER = 1_000
 
 
 def collect_products(*node_products: ProductList) -> ProductList:
@@ -54,6 +57,8 @@ class ProductDisc(List[Tuple[float, GeoNode, GeoNode]]):
 
         node_pot = self.pot[node]
         for other in node.linked:
+            if not isinstance(other, Consumer):
+                continue
             dist = node.dist(other)
             delta = -node_pot + dist
             if delta < 0:
@@ -87,18 +92,18 @@ class RouteBuilder(object):
         self.stocks = {w_node: collect_products(w_node.stock) for w_node in self.sys.warehouses}
         self.orders = {c_node: collect_products(c_node.order) for c_node in self.sys.consumers}
 
-    def calc_routes(self) -> List[Route]:
+    def calc_routes(self, iter_limit: int = MAX_ITER) -> RouteList:
         routes = self._estimate_routes()
         self.sys.init_balance(routes)
 
-        routes = self._main_routes(routes)
+        routes = self._main_routes(routes, iter_limit)
 
         routes = self._close_routes(routes)
 
         return routes
 
-    def _init_routes(self) -> List[Route]:
-        all_routes: List[Route] = []
+    def _init_routes(self) -> RouteList:
+        all_routes = RouteList()
         for c_node in self.sys.consumers:
             for w_node in c_node.linked:
                 if not isinstance(w_node, Warehouse):
@@ -111,11 +116,11 @@ class RouteBuilder(object):
         all_routes.sort(key=lambda route: route.dist)
         return all_routes
 
-    def _estimate_routes(self) -> List[Route]:
+    def _estimate_routes(self) -> RouteList:
         all_routes = self._init_routes()
 
         transport = self.sys.parking.transport
-        routes = []
+        routes = RouteList()
 
         for index, r in enumerate(all_routes):
             c_node: Consumer = r.ctail
@@ -141,37 +146,57 @@ class RouteBuilder(object):
 
         return routes
 
-    def _optimization_iteration(self, pre_routes: List[Route]) -> bool:
+    def _optimization_iteration(self, pre_routes: RouteList) -> bool:
         pot = self._calculate_potentials(pre_routes)
         disc = self._calculate_discrepancy(pot, pre_routes)
         merged_disc = self._merge_discrepancy(disc)
+        pending_routes = pre_routes.blank_routes
+
+        viewed_nodes: Dict[GeoNode, List[Route]] = defaultdict(lambda: [])
 
         for local_disc, from_node, to_node in merged_disc:
-
-            from_routes: List[Route] = sorted(filter(lambda r: r.tail == from_node, pre_routes),
-                                              key=lambda r: r.occupancy)
-
-            to_routes: List[Route] = sorted(filter(lambda r: r.tail == to_node, pre_routes),
-                                            key=lambda r: r.occupancy)
+            to_routes = pending_routes.by_tail(to_node).sort_occupancy
+            from_routes = pending_routes.by_tail(from_node).sort_occupancy
+            alt_routes = sorted(from_routes + viewed_nodes[to_node], key=lambda r: r.tail.dist(to_node) * r.occupancy)
 
             for route in to_routes:
-                for alt_route in from_routes:
-                    if route.occupancy > 1 - alt_route.occupancy:
-                        continue  # not enough space
+                balance_snapshot = self.sys.balance_snapshot
+                route_snapshot = pre_routes.snapshot
+                init_cost = pre_routes.cost
+                upd_routes = RouteList([route])
+
+                for alt_route in alt_routes:
+                    upd_routes.append(alt_route)
+                    # if route.occupancy > 1 - alt_route.occupancy:
+                    #     continue  # not enough space
                     if route.warehouse == alt_route.warehouse:
                         # enough space & same warehouse
                         if alt_route.take_over(route):
                             pre_routes.remove(route)
                             return True
 
+                        new_cost = pre_routes.cost
+                        if new_cost < init_cost:
+                            return True
+                        elif new_cost - route.cost > init_cost:
+                            break
+
+                self.sys.balance_rollback(balance_snapshot)
+                upd_routes.rollback(route_snapshot)
+
+            viewed_nodes[to_node] += from_routes
+
         return False
 
-    def _main_routes(self, pre_routes: List[Route]) -> List[Route]:
+    def _main_routes(self, pre_routes: RouteList, iter_limit: int = MAX_ITER) -> RouteList:
         self._product_dict()
 
-        upd = self._optimization_iteration(pre_routes)
-        while upd:
+        for i in range(iter_limit):
             upd = self._optimization_iteration(pre_routes)
+            if not upd:
+                break
+        else:
+            print(f'Iteration limit {MAX_ITER} reached')
 
         return pre_routes
 
@@ -201,7 +226,7 @@ class RouteBuilder(object):
 
         return pot
 
-    def _calculate_discrepancy(self, pot: Dict[str, ProductPot], routes: List[Route]) -> Dict[str, ProductDisc]:
+    def _calculate_discrepancy(self, pot: Dict[str, ProductPot], routes: RouteList) -> Dict[str, ProductDisc]:
         disc: Dict[str, ProductDisc] = {prod: ProductDisc(prod, prod_pot, routes) for prod, prod_pot in pot.items()}
         return disc
 
@@ -213,7 +238,7 @@ class RouteBuilder(object):
         merged_disc.sort(key=lambda x: x[0])
         return merged_disc
 
-    def _close_routes(self, routes: List[Route]) -> List[Route]:
+    def _close_routes(self, routes: RouteList) -> RouteList:
         self.road_map.find_routes(self.sys.parking)
 
         for route in routes:

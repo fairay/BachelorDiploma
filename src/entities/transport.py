@@ -4,4 +4,4 @@ class Transport:
         self.volume: float = volume
 
     def __repr__(self) -> str:
-        return f'{self.name} (📦:{self.volume}, 🔥:{self.cons})'
+        return f'{self.name} (📦:{self.volume})'
