@@ -145,7 +145,7 @@
                                     </size>
                                 </property>
                                 <property name="text">
-                                    <string>Расчитать маршруты</string>
+                                    <string>Рассчитать маршруты</string>
                                 </property>
                             </widget>
                         </item>

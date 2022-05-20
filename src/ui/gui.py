@@ -126,7 +126,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Оптимизация маршрутов поставок"))
-        self.calcRoutesW.setText(_translate("MainWindow", "Расчитать маршруты"))
+        self.calcRoutesW.setText(_translate("MainWindow", "Рассчитать маршруты"))
         self.action_stat.setTitle(_translate("MainWindow", "Статистика"))
         self.menu_4.setTitle(_translate("MainWindow", "Файл"))
         self.menu_5.setTitle(_translate("MainWindow", "Добавить"))
