@@ -9,6 +9,7 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from entities import TransportSystem, Route, Parking, Warehouse, Consumer, GeoNode, RouteBuilder
 from graphics import get_figure
 from ui.dialogs import ParkingDialog, WarehouseDialog, ConsumerDialog, NodeDialog
+from ui.dialogs.config import GUIConfig, ConfigDialog
 from ui.dialogs.route import RouteDialog
 from ui.fields.route import RouteField
 from ui.gui import *
@@ -61,6 +62,7 @@ class MainWin(QtWidgets.QMainWindow):
         else:
             self.import_sys(sys_file)
         self.routes = []
+        self.config = GUIConfig()
 
         self.render_ui()
         self.set_binds()
@@ -76,6 +78,8 @@ class MainWin(QtWidgets.QMainWindow):
         self.ui.action_parking.triggered.connect(self.action_parking)
         self.ui.action_warehouse.triggered.connect(self.action_warehouse)
         self.ui.action_consumer.triggered.connect(self.action_consumer)
+
+        self.ui.action_config.triggered.connect(self.config_dialog)
 
         self.ui.calcRoutesW.clicked.connect(self.build_routes)
 
@@ -194,6 +198,7 @@ class MainWin(QtWidgets.QMainWindow):
 
     def clean_routes(self):
         self.ui.routeList.clear()
+        self.routes = []
 
     def show_route(self, r: Route):
         widget = RouteField(r, self.route_dialog)
@@ -203,20 +208,33 @@ class MainWin(QtWidgets.QMainWindow):
         self.ui.routeList.setItemWidget(item, widget)
 
     def build_routes(self):
-        route_builder = RouteBuilder(self.sys)
-        self.routes = route_builder.calc_routes(0)
-
         self.clean_routes()
+        try:
+            route_builder = RouteBuilder(self.sys)
+            self.routes = route_builder.calc_routes(self.config.iters)
+        except Exception as e:
+            self.ui.err_msg(str(e))
+
         for r in self.routes:
             self.show_route(r)
+        self.render_ui()
 
     def node_dialog(self, dialog: Type[NodeDialog], node: GeoNode):
         form = dialog(node, self.sys)
         code = form.exec_()
         if code:
             self.unsaved = True
+            self.clean_routes()
             self.render_ui()
 
     def route_dialog(self, route: Route):
         form = RouteDialog(route, self.sys)
         _ = form.exec_()
+
+    def config_dialog(self):
+        form = ConfigDialog(self.config)
+        code = form.exec_()
+
+        if code:
+            self.clean_routes()
+            self.render_ui()

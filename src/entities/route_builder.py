@@ -189,6 +189,9 @@ class RouteBuilder(object):
         return False
 
     def _main_routes(self, pre_routes: RouteList, iter_limit: int = MAX_ITER) -> RouteList:
+        if not iter_limit:
+            return pre_routes
+
         self._product_dict()
 
         for i in range(iter_limit):
