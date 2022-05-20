@@ -18,45 +18,30 @@ def small_sys() -> TransportSystem:
 
 
 class MyTestCase(unittest.TestCase):
-    def test_1(self):
-        tsys = TransportSystem.Loader.load('./configs/test1.json')
+    def case(self, filename: str, want_route_n: int):
+        tsys = TransportSystem.Loader.load(f'./configs/{filename}.json')
 
         route_builder = RouteBuilder(tsys)
         routes = route_builder.calc_routes()
 
-        self.assertEqual(len(routes), 1)
+        self.assertEqual(len(routes), want_route_n)
 
-    def test_2(self):
-        tsys = TransportSystem.Loader.load('./configs/test2.json')
+    def test_files(self):
+        cases = {
+            'test1': 1,
+            'test2': 3,
+            'test3': 1,
+            'test4': 2,
+            'test5': 2,
+            'test6': 1,
+            'test7': 2,
+            'test8': 2,
+            'test9': 1,
+        }
 
-        route_builder = RouteBuilder(tsys)
-        routes = route_builder.calc_routes()
-
-        self.assertEqual(len(routes), 3)
-
-    def test_3(self):
-        tsys = TransportSystem.Loader.load('./configs/test3.json')
-
-        route_builder = RouteBuilder(tsys)
-        routes = route_builder.calc_routes()
-
-        self.assertEqual(len(routes), 1)
-
-    def test_4(self):
-        tsys = TransportSystem.Loader.load('./configs/test4.json')
-
-        route_builder = RouteBuilder(tsys)
-        routes = route_builder.calc_routes()
-
-        self.assertEqual(len(routes), 2)
-
-    def test_5(self):
-        tsys = TransportSystem.Loader.load('./configs/test5.json')
-
-        route_builder = RouteBuilder(tsys)
-        routes = route_builder.calc_routes()
-
-        self.assertEqual(len(routes), 2)
+        for filename, want in cases.items():
+            with self.subTest(filename=filename, want=want):
+                self.case(filename, want)
 
 
 if __name__ == '__main__':
