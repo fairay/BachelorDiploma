@@ -1,6 +1,8 @@
 from copy import copy
 from typing import Union, Optional
 
+from .nodes.geonode import GeoNode
+
 
 class Product:
     __match_args__ = ('name',)
@@ -82,6 +84,31 @@ class ProductList(list[Product]):
     def is_empty(self):
         return len(self) == 0
 
+    def from_balance(self, node: GeoNode) -> 'ProductList':
+        write_off = ProductList()
+        for prod in self:
+            if prod.name not in node.balance or node.balance[prod.name] == 0:
+                continue
+
+            amount = min(prod.amount, node.balance[prod.name])
+
+            node.balance[prod.name] -= amount
+            if node.balance[prod.name] == 0:
+                del node.balance[prod.name]
+
+            new_prod = copy(prod)
+            new_prod.amount = amount
+            write_off.append(new_prod)
+
+        return write_off
+
+    def to_balance(self, node: GeoNode):
+        for prod in self:
+            if prod.name not in node.balance:
+                node.balance[prod.name] = prod.amount
+            else:
+                node.balance[prod.name] += prod.amount
+
     @property
     def volume(self) -> float:
         return sum(prod.sum_volume for prod in self)
@@ -97,10 +124,10 @@ class ProductList(list[Product]):
         Returns reminder list of products
         """
 
-        amount = int(volume / self[0].volume + 1e-4)
         if self.volume <= volume:
             return ProductList()
 
+        amount = int(volume / self[0].volume + 1e-5)
         rem = ProductList(self)
         rem.sort(key=lambda prod: prod.amount, reverse=True)
         self.clear()
@@ -108,8 +135,8 @@ class ProductList(list[Product]):
         self_amount = 0
         for prod in rem:
             prod_amount = prod.amount
-            if self_amount + prod_amount < volume:
-                self.append(prod)
+            if self_amount + prod_amount <= amount:
+                self.append(copy(prod))
                 self_amount += prod_amount
 
         rem.minus(self)

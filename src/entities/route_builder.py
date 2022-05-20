@@ -167,19 +167,18 @@ class RouteBuilder(object):
 
                 for alt_route in alt_routes:
                     upd_routes.append(alt_route)
-                    # if route.occupancy > 1 - alt_route.occupancy:
-                    #     continue  # not enough space
-                    if route.warehouse == alt_route.warehouse:
-                        # enough space & same warehouse
-                        if alt_route.take_over(route):
-                            pre_routes.remove(route)
-                            return True
+                    # same warehouse
+                    # if route.warehouse != alt_route.warehouse:
+                    #     continue
+                    if alt_route.take_over(route):
+                        pre_routes.remove(route)
+                        return True
 
-                        new_cost = pre_routes.cost
-                        if new_cost < init_cost:
-                            return True
-                        elif new_cost - route.cost > init_cost:
-                            break
+                    new_cost = pre_routes.cost
+                    if new_cost < init_cost:
+                        return True
+                    elif new_cost - route.cost > init_cost:
+                        break
 
                 self.sys.balance_rollback(balance_snapshot)
                 upd_routes.rollback(route_snapshot)

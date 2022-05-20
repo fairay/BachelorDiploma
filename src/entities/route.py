@@ -182,28 +182,58 @@ class Route:
         return dist_dict
 
     def _take_over_same(self, other: 'Route') -> bool:
+        other_warehouse = other.warehouse
+        other_warehouse_index = other.nodes.index(other_warehouse)
         warehouse_index = self.nodes.index(self.warehouse)
-        free = self.free_space
 
         for node, load in zip(other.nodes[::-1], other.loads[::-1]):
-            if node == other.warehouse:
+            if node == other_warehouse:
                 return True
 
-            if load.amount <= free:
-                self.nodes.append(node)
-                self.loads.append(load)
-                self.loads[warehouse_index].add(load)
+            transit = copy(load)
+            rem = transit.to_restriction(self.free_volume)
 
+            self.nodes.append(node)
+            self.loads.append(transit)
+            self.loads[warehouse_index].add(transit)
+            other.loads[other_warehouse_index].minus(transit)
+
+            if rem.amount:
+                other.loads[-1] = rem
+                return False
+            else:
                 other.nodes.pop()
                 other.loads.pop()
-            else:
-                rem_load = load.to_restriction(self.free_volume)
-                self.nodes.append(node)
-                self.loads.append(load)
-                self.loads[warehouse_index].add(load)
 
-                other.loads[-1] = rem_load
+        return True
+
+    def _take_over_diff(self, other: 'Route') -> bool:
+        warehouse_index = self.nodes.index(self.warehouse)
+        other_warehouse = other.warehouse
+        other_warehouse_index = other.nodes.index(other_warehouse)
+
+        for node, load in zip(other.nodes[::-1], other.loads[::-1]):
+            if node == other_warehouse:
+                return True
+
+            transit = load.from_balance(self.warehouse)
+            rem = transit.to_restriction(self.free_volume)
+            if not len(transit):
                 return False
+            load.minus(transit)
+            rem.to_balance(self.warehouse)
+            transit.to_balance(other_warehouse)
+
+            self.nodes.append(node)
+            self.loads.append(transit)
+            self.loads[warehouse_index].add(transit)
+            other.loads[other_warehouse_index].minus(transit)
+
+            if load.amount:
+                return False
+            else:
+                other.nodes.pop()
+                other.loads.pop()
 
         return True
 
@@ -211,7 +241,7 @@ class Route:
         if self.warehouse == other.warehouse:
             return self._take_over_same(other)
         else:
-            pass
+            return self._take_over_diff(other)
 
     def rollback(self, other: 'Route'):
         self.nodes = other.nodes

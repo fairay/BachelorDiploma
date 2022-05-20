@@ -1,13 +1,8 @@
-from entities.route_builder import MAX_ITER
-from copy import copy
-
-from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QHBoxLayout, QSpacerItem, QSizePolicy, QVBoxLayout, QLineEdit, QPushButton, \
-    QListWidgetItem, QListWidget, QMessageBox, QLabel, QSlider
+from PyQt5.QtWidgets import QDialog, QHBoxLayout, QSpacerItem, QSizePolicy, QVBoxLayout, QPushButton, \
+    QMessageBox, QLabel, QSlider
 
-from entities import *
-from ui.fields import *
+from entities.route_builder import MAX_ITER
 
 
 class GUIConfig(object):
@@ -55,7 +50,6 @@ class ConfigDialog(QDialog):
         self.iterLabel.setText(f'Максимальное количество итераций: {self.iterW.value()}')
 
     def main_UI(self):
-        print('hello')
         layout = QVBoxLayout()
 
         self.iterLabel = QLabel('Максимальное количество итераций', self)
