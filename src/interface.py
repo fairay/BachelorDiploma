@@ -1,4 +1,4 @@
-from typing import List, Type
+from typing import Type
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeySequence
@@ -7,6 +7,7 @@ from matplotlib.backends.backend_qt import NavigationToolbar2QT
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 
 from entities import TransportSystem, Route, Parking, Warehouse, Consumer, GeoNode, RouteBuilder
+from entities.route_shedule import RouteScheduleList
 from graphics import get_figure
 from ui.dialogs import ParkingDialog, WarehouseDialog, ConsumerDialog, NodeDialog
 from ui.dialogs.config import GUIConfig, ConfigDialog
@@ -44,7 +45,7 @@ class MainWin(QtWidgets.QMainWindow):
     window_title = 'Оптимизация маршрутов поставок'
 
     sys: TransportSystem
-    routes: List[Route]
+    routes: RouteScheduleList
 
     sys_file: str
     unsaved: bool
@@ -61,7 +62,7 @@ class MainWin(QtWidgets.QMainWindow):
             self.sys = tsys
         else:
             self.import_sys(sys_file)
-        self.routes = []
+        self.routes = RouteScheduleList()
         self.config = GUIConfig()
 
         self.render_ui()
@@ -198,7 +199,7 @@ class MainWin(QtWidgets.QMainWindow):
 
     def clean_routes(self):
         self.ui.routeList.clear()
-        self.routes = []
+        self.routes = RouteScheduleList()
 
     def show_route(self, r: Route):
         widget = RouteField(r, self.route_dialog)

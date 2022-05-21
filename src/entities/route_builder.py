@@ -6,6 +6,7 @@ from .nodes import Warehouse, Consumer, GeoNode
 from .product import ProductList
 from .road_map import RoadMap
 from .route import Route, RouteList
+from .route_shedule import ScheduleBuilder, RouteScheduleList
 from .system import TransportSystem
 
 MAX_ITER = 1_000
@@ -92,15 +93,16 @@ class RouteBuilder(object):
         self.stocks = {w_node: collect_products(w_node.stock) for w_node in self.sys.warehouses}
         self.orders = {c_node: collect_products(c_node.order) for c_node in self.sys.consumers}
 
-    def calc_routes(self, iter_limit: int = MAX_ITER) -> RouteList:
+    def calc_routes(self, iter_limit: int = MAX_ITER) -> RouteScheduleList:
         routes = self._estimate_routes()
         self.sys.init_balance(routes)
 
         routes = self._main_routes(routes, iter_limit)
 
         routes = self._close_routes(routes)
+        schedule = ScheduleBuilder(self.sys).build_schedule(routes)
 
-        return routes
+        return schedule
 
     def _init_routes(self) -> RouteList:
         all_routes = RouteList()
