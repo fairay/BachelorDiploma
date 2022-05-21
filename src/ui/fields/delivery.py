@@ -1,4 +1,8 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QSpacerItem, QSizePolicy, QVBoxLayout, QListWidget, QListWidgetItem
+import datetime as dt
+
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QWidget, QLabel, QSpacerItem, QSizePolicy, QVBoxLayout, QListWidget, QListWidgetItem, \
+    QHBoxLayout
 
 from entities import GeoNode, ProductList, Product
 from entities.nodes import Warehouse
@@ -8,11 +12,15 @@ from ui.fields import ProductDeliveryField
 class DeliveryField(QWidget):
     node: GeoNode
     load: ProductList
+    arrival: dt.timedelta
+    departure: dt.timedelta
 
-    def __init__(self, node: GeoNode, load: ProductList):
+    def __init__(self, node: GeoNode, load: ProductList, arrival: dt.timedelta, departure: dt.timedelta):
         super(DeliveryField, self).__init__(parent=None)
         self.node = node
         self.load = load
+        self.arrival = arrival
+        self.departure = departure
 
         self.init_ui()
         self.init_data()
@@ -23,8 +31,7 @@ class DeliveryField(QWidget):
         self.setLayout(self.layout)
         self.layout.addItem(QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum))
 
-        self.titleW = QLabel(self.node.name)
-        self.layout.addWidget(self.titleW)
+        self.label_ui()
 
         if not len(self.load):
             return
@@ -34,6 +41,26 @@ class DeliveryField(QWidget):
         self.loadW.setProperty('class', 'delivery-list')
         self.loadW.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding))
         self.layout.addWidget(self.loadW)
+
+    def label_ui(self):
+        layout = QHBoxLayout()
+
+        self.titleW = QLabel(self.node.name, self)
+        layout.addWidget(self.titleW)
+
+        if self.arrival == self.departure:
+            t = dt.datetime(2000, 1, 1) + self.arrival
+            time_text = t.strftime("%H:%M")
+        else:
+            t1 = dt.datetime(2000, 1, 1) + self.arrival
+            t2 = dt.datetime(2000, 1, 1) + self.departure
+            time_text = f'{t1.strftime("%H:%M")} - {t2.strftime("%H:%M")}'
+
+        timeW = QLabel(time_text, self)
+        timeW.setAlignment(Qt.AlignRight)
+        layout.addWidget(timeW)
+
+        self.layout.addItem(layout)
 
     def init_data(self):
         for product in self.load:

@@ -215,6 +215,7 @@
                 </property>
                 <addaction name="action_config"/>
                 <addaction name="action_stat"/>
+                <addaction name="action_schedule"/>
             </widget>
             <addaction name="menu_4"/>
             <addaction name="menu_5"/>
@@ -294,6 +295,11 @@
         <action name="action_stat">
             <property name="text">
                 <string>Статистика</string>
+            </property>
+        </action>
+        <action name="action_schedule">
+            <property name="text">
+                <string>График маршрутов</string>
             </property>
         </action>
     </widget>

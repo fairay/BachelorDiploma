@@ -8,7 +8,7 @@ from .transport import Transport
 
 
 def is_intersect(from1: dt.timedelta, to1: dt.timedelta, from2: dt.timedelta, to2: dt.timedelta) -> bool:
-    return (from1 < from2 < to1) or (from2 < from1 < to2)
+    return (from1 <= from2 <= to1) or (from2 <= from1 <= to2)
 
 
 def required_offset(from1: dt.timedelta, to1: dt.timedelta, from2: dt.timedelta, to2: dt.timedelta) -> dt.timedelta:
@@ -24,9 +24,9 @@ class RouteSchedule(Route):
     _arrival: List[dt.timedelta]
     _departure: List[dt.timedelta]
     intervals = {
-        Parking: dt.timedelta(minutes=0),
+        Parking: dt.timedelta(minutes=2),
         Warehouse: dt.timedelta(minutes=10),
-        Consumer: dt.timedelta(minutes=15),
+        Consumer: dt.timedelta(minutes=12),
         GeoNode: dt.timedelta(minutes=0)
     }
 
@@ -48,7 +48,10 @@ class RouteSchedule(Route):
             if last_node:
                 current_time += dt.timedelta(minutes=last_node.linked[node].time)
 
-            interval = self.intervals[type(node)] if load.amount else dt.timedelta(0)
+            if load.amount or isinstance(node, Parking):
+                interval = self.intervals[type(node)]
+            else:
+                interval = dt.timedelta(0)
             self._arrival.append(current_time)
             current_time += interval
             self._departure.append(current_time)
@@ -62,7 +65,7 @@ class RouteSchedule(Route):
         """
         self_stops = self.stops
         for node in self_stops:
-            if node not in other.stops:
+            if node not in other.stops or isinstance(node, Parking):
                 continue
 
             self_stop = self_stops[node]
@@ -91,8 +94,8 @@ class RouteSchedule(Route):
 
     @property
     def nodes_schedule(self):
-        # node, arrival, departure
-        return zip(self.nodes, self._arrival, self._departure)
+        # node, load, arrival, departure
+        return zip(self.nodes, self.loads, self._arrival, self._departure)
 
     @property
     def stops(self) -> Dict[GeoNode, Tuple[dt.timedelta, dt.timedelta]]:
@@ -135,7 +138,7 @@ class TransportAssignment(dict[Transport, RouteScheduleList]):
         if start is not None and start > route.begin:
             route.begin = start
 
-        routes = filter(lambda r: r.end > route.begin, self.routes)
+        routes = list(filter(lambda r: r.end > route.begin, self.routes))
 
         for other in routes:
             if other.shove(route):

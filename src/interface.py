@@ -7,7 +7,8 @@ from matplotlib.backends.backend_qt import NavigationToolbar2QT
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 
 from entities import TransportSystem, Route, Parking, Warehouse, Consumer, GeoNode, RouteBuilder
-from entities.route_shedule import RouteScheduleList
+from entities.route_shedule import RouteScheduleList, RouteSchedule
+from gantt import draw_grant
 from graphics import get_figure
 from ui.dialogs import ParkingDialog, WarehouseDialog, ConsumerDialog, NodeDialog
 from ui.dialogs.config import GUIConfig, ConfigDialog
@@ -81,6 +82,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.ui.action_consumer.triggered.connect(self.action_consumer)
 
         self.ui.action_config.triggered.connect(self.config_dialog)
+        self.ui.action_schedule.triggered.connect(self.show_schedule)
 
         self.ui.calcRoutesW.clicked.connect(self.build_routes)
 
@@ -220,6 +222,11 @@ class MainWin(QtWidgets.QMainWindow):
             self.show_route(r)
         self.render_ui()
 
+    def show_schedule(self):
+        if not self.routes:
+            self.build_routes()
+        draw_grant(self.sys, self.routes)
+
     def node_dialog(self, dialog: Type[NodeDialog], node: GeoNode):
         form = dialog(node, self.sys)
         code = form.exec_()
@@ -228,7 +235,7 @@ class MainWin(QtWidgets.QMainWindow):
             self.clean_routes()
             self.render_ui()
 
-    def route_dialog(self, route: Route):
+    def route_dialog(self, route: RouteSchedule):
         form = RouteDialog(route, self.sys)
         _ = form.exec_()
 
