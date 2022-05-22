@@ -105,6 +105,8 @@ class RouteBuilder(object):
         return schedule
 
     def _init_routes(self) -> RouteList:
+        self.road_map.find_routes(self.sys.parking)
+
         all_routes = RouteList()
         for c_node in self.sys.consumers:
             for w_node in c_node.linked:
@@ -112,7 +114,8 @@ class RouteBuilder(object):
                     continue
 
                 w_node: Warehouse
-                route = Route(self.sys.parking, w_node, c_node)
+                route = copy(self.road_map.route(self.sys.parking, w_node))
+                route.prolong(Route(w_node, c_node))
                 all_routes.append(route)
 
         all_routes.sort(key=lambda route: route.dist)
@@ -169,9 +172,6 @@ class RouteBuilder(object):
 
                 for alt_route in alt_routes:
                     upd_routes.append(alt_route)
-                    # same warehouse
-                    # if route.warehouse != alt_route.warehouse:
-                    #     continue
                     if alt_route.take_over(route):
                         pre_routes.remove(route)
                         return True

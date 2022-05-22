@@ -42,7 +42,7 @@ class Route:
         self.track = track
 
     def set_load(self, node: GeoNode, load: ProductList):
-        i = self.nodes.index(node)
+        i = len(self.nodes) - 1 - self.nodes[::-1].index(node)
         self.loads[i] = load
 
     def extend(self, node: GeoNode) -> 'Route':
@@ -81,12 +81,9 @@ class Route:
 
     @property
     def roads_forward(self) -> List[LinkedRoad]:
-        last_forward = self.last_delivery
-        index = self.nodes.index(last_forward)
+        index = self.last_delivery
         roads: List[LinkedRoad] = []
         for from_node, to_node in zip(self.nodes[:index], self.nodes[1:index + 1]):
-            if from_node == last_forward:
-                break
             road = from_node.linked[to_node]
             roads.append(LinkedRoad(from_node, to_node, road.dist, road.time))
 
@@ -94,8 +91,7 @@ class Route:
 
     @property
     def roads_backward(self) -> List[LinkedRoad]:
-        last_forward = self.last_delivery
-        index = self.nodes.index(last_forward)
+        index = self.last_delivery
         roads: List[LinkedRoad] = []
         for from_node, to_node in zip(self.nodes[index:-1], self.nodes[index + 1:]):
             road = from_node.linked[to_node]
@@ -141,9 +137,9 @@ class Route:
         return self.find_warehouse(empty_route=False)
 
     @property
-    def last_delivery(self) -> GeoNode:
-        for node, load in zip(reversed(self.nodes), reversed(self.loads)):
-            if load: return node
+    def last_delivery(self) -> int:
+        for index, load in enumerate(reversed(self.loads)):
+            if load: return len(self.nodes) - 1 - index
 
     def find_warehouse(self, empty_route=False):
         for node, load in zip(self.nodes, self.loads):

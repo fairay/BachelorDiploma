@@ -59,13 +59,9 @@ class TransportSystem(object):
         elif not self.transport:
             raise Exception("No transport")
 
-        for w_node in self.warehouses:
-            if self.parking not in w_node.linked.keys():
-                raise Exception(f'{w_node} not linked with parking')
-
-        for c_node in self.consumers:
-            if not len(c_node.linked):
-                raise Exception(f'{c_node} has no roads')
+        for node in self.nodes:
+            if not len(node.linked):
+                raise Exception(f'{node} has no roads')
 
     def add_warehouse(self, node: Warehouse, parking_road: Road = None):
         if not node.is_linked(self.parking):
