@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QShortcut, QFileDialog, QListWidgetItem
 from matplotlib.backends.backend_qt import NavigationToolbar2QT
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 
-from entities import TransportSystem, Route, Parking, Warehouse, Consumer, GeoNode, RouteBuilder
+from entities import TransportSystem, Parking, Warehouse, Consumer, GeoNode, RouteBuilder
 from entities.route_shedule import RouteScheduleList, RouteSchedule
 from gantt import draw_grant
 from graphics import get_figure
@@ -203,7 +203,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.ui.routeList.clear()
         self.routes = RouteScheduleList()
 
-    def show_route(self, r: Route):
+    def show_route(self, r: RouteSchedule):
         widget = RouteField(r, self.route_dialog)
         item = QListWidgetItem(self.ui.routeList)
         item.setSizeHint(widget.sizeHint())

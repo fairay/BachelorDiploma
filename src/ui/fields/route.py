@@ -3,13 +3,13 @@ from typing import Callable, Any
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy
 
-from entities import Route
+from entities.route_shedule import RouteSchedule
 
 
 class RouteField(QWidget):
-    route: Route
+    route: RouteSchedule
 
-    def __init__(self, route: Route, show_dialog: Callable[[Route], Any]):
+    def __init__(self, route: RouteSchedule, show_dialog: Callable[[RouteSchedule], Any]):
         super(RouteField, self).__init__(parent=None)
         self.route = route
         self.show_dialog = show_dialog

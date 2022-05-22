@@ -94,7 +94,7 @@ class RouteBuilder(object):
         self.orders = {c_node: collect_products(c_node.order) for c_node in self.sys.consumers}
 
     def calc_routes(self, iter_limit: int = MAX_ITER) -> RouteScheduleList:
-        routes = self._estimate_routes()
+        routes = self._min_elem_routes()
         self.sys.init_balance(routes)
 
         routes = self._main_routes(routes, iter_limit)
@@ -118,10 +118,10 @@ class RouteBuilder(object):
         all_routes.sort(key=lambda route: route.dist)
         return all_routes
 
-    def _estimate_routes(self) -> RouteList:
+    def _min_elem_routes(self) -> RouteList:
         all_routes = self._init_routes()
 
-        transport = self.sys.parking.transport
+        transport = self.sys.transport
         routes = RouteList()
 
         for index, r in enumerate(all_routes):
