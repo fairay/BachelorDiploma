@@ -97,7 +97,7 @@ class RouteBuilder(object):
         routes = self._min_elem_routes()
         self.sys.init_balance(routes)
 
-        routes = self._main_routes(routes, iter_limit)
+        routes = self._potential_optimize(routes, iter_limit)
 
         routes = self._close_routes(routes)
         schedule = ScheduleBuilder(self.sys).build_schedule(routes)
@@ -189,7 +189,7 @@ class RouteBuilder(object):
 
         return False
 
-    def _main_routes(self, pre_routes: RouteList, iter_limit: int = MAX_ITER) -> RouteList:
+    def _potential_optimize(self, pre_routes: RouteList, iter_limit: int = MAX_ITER) -> RouteList:
         if not iter_limit:
             return pre_routes
 
