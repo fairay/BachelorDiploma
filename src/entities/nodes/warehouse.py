@@ -29,7 +29,7 @@ class Warehouse(GeoNode):
                 self.stock[i] = new_product
                 return
 
-        self.stock.append(new_product)
+        self.stock.append(copy(new_product))
 
     def update(self, other: 'Warehouse'):
         super(Warehouse, self).update(other)

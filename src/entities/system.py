@@ -65,9 +65,8 @@ class TransportSystem(object):
 
     def add_warehouse(self, node: Warehouse, parking_road: Road = None):
         if not node.is_linked(self.parking):
-            if parking_road is None:
-                parking_road = Road()
-            node.add_node(self.parking, parking_road)
+            if parking_road is not None:
+                node.add_node(self.parking, parking_road)
 
         self.warehouses.append(node)
 
@@ -78,6 +77,7 @@ class TransportSystem(object):
         self.parking = node
 
     def add_transport(self, truck: Transport):
+        truck.volume = self.con
         self.parking.add_transport(truck)
 
     def add_link(self, ind1: int, ind2: int, dist=1.0, time=1.0):

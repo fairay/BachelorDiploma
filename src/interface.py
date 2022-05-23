@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QShortcut, QFileDialog, QListWidgetItem
 from matplotlib.backends.backend_qt import NavigationToolbar2QT
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 
-from entities import TransportSystem, Parking, Warehouse, Consumer, GeoNode, RouteBuilder
+from entities import TransportSystem, Parking, Warehouse, Consumer, GeoNode, RouteBuilder, Road
 from entities.route_shedule import RouteScheduleList, RouteSchedule
 from gantt import draw_grant
 from graphics import get_figure
@@ -100,7 +100,7 @@ class MainWin(QtWidgets.QMainWindow):
 
     def action_warehouse(self):
         node = Warehouse()
-        self.sys.add_warehouse(node)
+        self.sys.add_warehouse(node, Road())
         self.unsaved = True
 
         self.render_ui()

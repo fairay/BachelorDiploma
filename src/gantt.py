@@ -1,4 +1,5 @@
 import datetime as dt
+import random
 
 import plotly as py
 import plotly.figure_factory as ff
@@ -31,7 +32,11 @@ def schedule_dict(sys: TransportSystem, routes: RouteScheduleList):
 
 def draw_schedule(sys: TransportSystem, routes: RouteScheduleList):
     df = schedule_dict(sys, routes)
-    return ff.create_gantt(df, index_col='Node',
+
+    r = lambda: random.randint(0, 255)
+    colors = ['#%02X%02X%02X' % (r(),r(),r()) for node in sys.nodes]
+
+    return ff.create_gantt(df, index_col='Node', colors=colors,
                            title='График маршрутов', show_colorbar=True,
                            group_tasks=True,
                            showgrid_x=True, showgrid_y=True)

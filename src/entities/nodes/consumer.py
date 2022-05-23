@@ -29,7 +29,7 @@ class Consumer(GeoNode):
                 self.order[i] = new_product
                 return
 
-        self.order.append(new_product)
+        self.order.append(copy(new_product))
 
     def update(self, other: 'Consumer'):
         super(Consumer, self).update(other)

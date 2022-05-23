@@ -23,6 +23,7 @@ class ProductFiled(QWidget):
         self.amountW = QSpinBox()
         self.amountW.setValue(amount)
         self.amountW.setFrame(0)
+        self.amountW.setMaximum(10000)
         self.layout.addWidget(self.amountW)
 
         self.editButton = QPushButton("🗑️")
