@@ -204,7 +204,8 @@ class MainWin(QtWidgets.QMainWindow):
         self.routes = RouteScheduleList()
 
     def show_route(self, r: RouteSchedule):
-        widget = RouteField(r, self.route_dialog)
+        truck_index = self.sys.transport.index(r.track)
+        widget = RouteField(r, truck_index, self.route_dialog)
         item = QListWidgetItem(self.ui.routeList)
         item.setSizeHint(widget.sizeHint())
         self.ui.routeList.addItem(item)
@@ -218,7 +219,7 @@ class MainWin(QtWidgets.QMainWindow):
         except Exception as e:
             self.ui.err_msg(str(e))
 
-        for r in self.routes:
+        for r in sorted(self.routes, key=lambda r: r.begin):
             self.show_route(r)
         self.render_ui()
 
@@ -236,7 +237,8 @@ class MainWin(QtWidgets.QMainWindow):
             self.render_ui()
 
     def route_dialog(self, route: RouteSchedule):
-        form = RouteDialog(route, self.sys)
+        truck_index = self.sys.transport.index(route.track)
+        form = RouteDialog(route, truck_index, self.sys)
         _ = form.exec_()
 
     def config_dialog(self):

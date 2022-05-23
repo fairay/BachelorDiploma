@@ -4,14 +4,16 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy
 
 from entities.route_shedule import RouteSchedule
-
+import datetime as dt
 
 class RouteField(QWidget):
     route: RouteSchedule
+    truck: int
 
-    def __init__(self, route: RouteSchedule, show_dialog: Callable[[RouteSchedule], Any]):
+    def __init__(self, route: RouteSchedule, truck: int, show_dialog: Callable[[RouteSchedule], Any]):
         super(RouteField, self).__init__(parent=None)
         self.route = route
+        self.truck = truck
         self.show_dialog = show_dialog
 
         self.setProperty('class', 'list')
@@ -29,7 +31,11 @@ class RouteField(QWidget):
         self.updateContent()
 
     def updateContent(self) -> None:
-        self.titleW.setText(str(self.route))
+        t1 = dt.datetime(2000, 1, 1) + self.route.begin
+        t2 = dt.datetime(2000, 1, 1) + self.route.end
+
+        title = f'[{self.truck}] {t1.strftime("%H:%M")} - {t2.strftime("%H:%M")}'
+        self.titleW.setText(title)
 
     def clickEvent(self):
         try:

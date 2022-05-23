@@ -14,10 +14,12 @@ class RouteDialog(QDialog):
     route: RouteSchedule
     sys: TransportSystem
 
-    def __init__(self, route: RouteSchedule, sys: TransportSystem):
+    def __init__(self, route: RouteSchedule, truck_i: int, sys: TransportSystem):
         super().__init__()
         self.route = route
         self.sys = sys
+        self.truck_i = truck_i
+
         self.init_UI()
         self.init_data()
 
@@ -44,7 +46,7 @@ class RouteDialog(QDialog):
         self.nodes_UI()
 
     def track_UI(self):
-        self.trackW = QLabel(self.route.track.name, self)
+        self.trackW = QLabel(f'[{self.truck_i}] {self.route.track.name}', self)
         self.content.addWidget(self.trackW)
 
     def nodes_UI(self):
