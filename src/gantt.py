@@ -34,7 +34,7 @@ def draw_schedule(sys: TransportSystem, routes: RouteScheduleList):
     df = schedule_dict(sys, routes)
 
     r = lambda: random.randint(0, 255)
-    colors = ['#%02X%02X%02X' % (r(),r(),r()) for node in sys.nodes]
+    colors = ['#%02X%02X%02X' % (r(), r(), r()) for node in sys.nodes]
 
     return ff.create_gantt(df, index_col='Node', colors=colors,
                            title='График маршрутов', show_colorbar=True,

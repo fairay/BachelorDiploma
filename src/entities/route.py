@@ -183,7 +183,7 @@ class Route:
         warehouse_index = self.nodes.index(self.warehouse)
 
         for node, load in zip(other.nodes[::-1], other.loads[::-1]):
-            if node == other_warehouse:
+            if not other.loads[other_warehouse_index].amount:
                 return True
 
             transit = copy(load)
@@ -200,6 +200,7 @@ class Route:
             else:
                 other.nodes.pop()
                 other.loads.pop()
+                return True
 
         return True
 
@@ -209,7 +210,7 @@ class Route:
         other_warehouse_index = other.nodes.index(other_warehouse)
 
         for node, load in zip(other.nodes[::-1], other.loads[::-1]):
-            if node == other_warehouse:
+            if not other.loads[other_warehouse_index].amount:
                 return True
 
             transit = load.from_balance(self.warehouse)
@@ -230,10 +231,14 @@ class Route:
             else:
                 other.nodes.pop()
                 other.loads.pop()
+                return True
 
         return True
 
     def take_over(self, other: 'Route') -> bool:
+        if not self.tail.is_linked(other.tail):
+            return False
+
         if self.warehouse == other.warehouse:
             return self._take_over_same(other)
         else:

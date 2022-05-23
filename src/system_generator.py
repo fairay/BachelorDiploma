@@ -8,7 +8,7 @@ from scipy.spatial.distance import euclidean
 
 from entities import TransportSystem, Parking, Product, Warehouse, Consumer, Transport
 
-DISC_SCALE = 2.0
+DISC_SCALE = 10.0
 MIN_SPEED = 0.5
 MAX_SPEED = 1.0
 TRUCK_N = 10
@@ -29,7 +29,7 @@ def random_system(node_n: int, warehouse_n: int) -> TransportSystem:
     prod = Product('пряники', 10)
     for i in range(warehouse_n):
         w = Warehouse(f'С {i}')
-        prod = Product('пряники', random.randint(14 * node_n//warehouse_n, 160 * node_n//warehouse_n))
+        prod = Product('пряники', random.randint(14 * node_n // warehouse_n, 160 * node_n // warehouse_n))
         w.add_product(prod)
         sys.add_warehouse(w)
 
@@ -47,7 +47,7 @@ def random_system(node_n: int, warehouse_n: int) -> TransportSystem:
         node0, node1 = G.nodes[ind0], G.nodes[ind1]
         pos0, pos1 = node0['pos'], node1['pos']
         dist = euclidean(pos0, pos1) * DISC_SCALE
-        time = dist * (MIN_SPEED + random.random()*(MAX_SPEED-MIN_SPEED))
+        time = dist / (MIN_SPEED + random.random() * (MAX_SPEED - MIN_SPEED))
         sys.add_link(ind0, ind1, dist, time)
 
     to_delete = []

@@ -1,9 +1,9 @@
 import sys
 
 import ui.styles as st
-from system_generator import random_system
 from interface import *
 from interface import MainWin
+from system_generator import random_system
 
 
 def main(tsys: TransportSystem):

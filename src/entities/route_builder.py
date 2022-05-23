@@ -157,24 +157,37 @@ class RouteBuilder(object):
         merged_disc = self._merge_discrepancy(disc)
         pending_routes = pre_routes.blank_routes
 
+        balance_snapshot = self.sys.balance_snapshot
+        init_cost = pre_routes.cost
+
         viewed_nodes: Dict[GeoNode, List[Route]] = defaultdict(lambda: [])
+        for from_node in self.sys.consumers:
+            from_routes = pending_routes.by_tail(from_node).sort_occupancy
+            for to_node in from_node.linked:
+                if isinstance(to_node, Consumer):
+                    viewed_nodes[to_node] += from_routes
 
         for local_disc, from_node, to_node in merged_disc:
             to_routes = pending_routes.by_tail(to_node).sort_occupancy
-            from_routes = pending_routes.by_tail(from_node).sort_occupancy
-            alt_routes = sorted(from_routes + viewed_nodes[to_node], key=lambda r: r.tail.dist(to_node) * r.occupancy)
+            alt_routes = sorted(viewed_nodes[to_node], key=lambda r: r.tail.dist(to_node) * r.occupancy)
 
             for route in to_routes:
-                balance_snapshot = self.sys.balance_snapshot
                 route_snapshot = pre_routes.snapshot
-                init_cost = pre_routes.cost
                 upd_routes = RouteList([route])
 
                 for alt_route in alt_routes:
                     upd_routes.append(alt_route)
                     if alt_route.take_over(route):
-                        pre_routes.remove(route)
-                        return True
+                        new_view = [alt_route] + viewed_nodes[route.tail]
+                        alt_routes = sorted(filter(lambda r: r.tail.dist(route.tail), new_view),
+                                            key=lambda r: r.tail.dist(route.tail) * r.occupancy)
+
+                    if route.warehouse is None:
+                        if pre_routes.cost - route.cost * 2 <= init_cost:
+                            pre_routes.remove(route)
+                            return True
+                        else:
+                            break
 
                     new_cost = pre_routes.cost
                     if new_cost < init_cost:
@@ -184,8 +197,6 @@ class RouteBuilder(object):
 
                 self.sys.balance_rollback(balance_snapshot)
                 upd_routes.rollback(route_snapshot)
-
-            viewed_nodes[to_node] += from_routes
 
         return False
 
