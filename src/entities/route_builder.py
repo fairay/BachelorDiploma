@@ -104,6 +104,33 @@ class RouteBuilder(object):
 
         return schedule
 
+    def stat_calc_routes(self) -> (RouteScheduleList, List):
+        routes = self._min_elem_routes()
+        self.sys.init_balance(routes)
+
+        self._product_dict()
+        stat_list = []
+
+        avg_dist = sum(r.dist for r in routes) / len(routes)
+        avg_full = sum(r.occupancy for r in routes) / len(routes)
+        stat_list.append({'cost': routes.cost, 'len': len(routes), 'avg_dist': avg_dist, 'avg_full': avg_full})
+
+        for i in range(MAX_ITER):
+            upd = self._optimization_iteration(routes)
+
+            avg_dist = sum(r.dist for r in routes) / len(routes)
+            avg_full = sum(r.occupancy for r in routes) / len(routes)
+            stat_list.append({'cost': routes.cost, 'len': len(routes), 'avg_dist': avg_dist, 'avg_full': avg_full})
+
+            if not upd:
+                break
+            print(f'{i} iter')
+
+        routes = self._close_routes(routes)
+        schedule = ScheduleBuilder(self.sys).build_schedule(routes)
+
+        return schedule, stat_list
+
     def _init_routes(self) -> RouteList:
         self.road_map.find_routes(self.sys.parking)
 

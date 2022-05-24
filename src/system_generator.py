@@ -14,22 +14,23 @@ MAX_SPEED = 1.0
 TRUCK_N = 10
 
 
-def random_system(node_n: int, warehouse_n: int) -> TransportSystem:
-    random.seed(2)
-    G = nx.random_geometric_graph(node_n, 0.2, seed=1)
+def random_system(node_n: int, warehouse_n: int, seed=1, con=5.0, vol=0.1, profit=2.0) -> TransportSystem:
+    random.seed(seed)
+    G = nx.soft_random_geometric_graph(node_n, 0.2, seed=seed)
     trans = list(range(node_n))
     shuffle(trans)
 
     sys = TransportSystem()
-    sys.vol = 0.1
-    sys.con = 5.0
+    sys.vol = vol
+    sys.con = con
 
     sys.add_parking(Parking())
 
     prod = Product('пряники', 10)
     for i in range(warehouse_n):
         w = Warehouse(f'С {i}')
-        prod = Product('пряники', random.randint(14 * node_n // warehouse_n, 160 * node_n // warehouse_n))
+        prod = Product('пряники', random.randint(int(profit * node_n // warehouse_n * 8),
+                                                 int(profit * node_n // warehouse_n * 12)))
         w.add_product(prod)
         sys.add_warehouse(w)
 
@@ -51,13 +52,12 @@ def random_system(node_n: int, warehouse_n: int) -> TransportSystem:
         sys.add_link(ind0, ind1, dist, time)
 
     to_delete = []
-    for cnode in sys.consumers:
-        cnt = len(list(filter(lambda n: isinstance(n, Warehouse), cnode.linked)))
-        if not cnt:
+    for cnode in sys.nodes:
+        if not len(cnode.linked):
             to_delete.append(cnode)
 
-    # for cnode in to_delete:
-    #     sys.del_node(cnode)
+    for cnode in to_delete:
+        sys.del_node(cnode)
 
     return sys
 
