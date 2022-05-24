@@ -56,8 +56,8 @@ def random_system(node_n: int, warehouse_n: int) -> TransportSystem:
         if not cnt:
             to_delete.append(cnode)
 
-    for cnode in to_delete:
-        sys.del_node(cnode)
+    # for cnode in to_delete:
+    #     sys.del_node(cnode)
 
     return sys
 
