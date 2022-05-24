@@ -216,10 +216,11 @@ class MainWin(QtWidgets.QMainWindow):
         try:
             route_builder = RouteBuilder(self.sys)
             self.routes = route_builder.calc_routes(self.config.iters)
+            self.routes.sort(key=lambda r: r.begin)
         except Exception as e:
             self.ui.err_msg(str(e))
 
-        for r in sorted(self.routes, key=lambda r: r.begin):
+        for r in self.routes:
             self.show_route(r)
         self.render_ui()
 

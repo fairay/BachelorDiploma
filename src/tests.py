@@ -38,7 +38,8 @@ class MyTestCase(unittest.TestCase):
             'test8': 2,
             'test9': 1,
             'test10': 2,
-            'test11': 1
+            'test11': 1,
+            'test12': 3,
         }
 
         for filename, want in cases.items():

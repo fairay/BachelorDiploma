@@ -131,10 +131,10 @@ class RouteBuilder(object):
 
             stock = self.stocks[w_node]
             order = self.orders[c_node]
-            if stock.is_empty() or order.is_empty():
+            cross_products = order * stock
+            if cross_products.is_empty():
                 continue
 
-            cross_products = order * stock
             selected_track = transport[index % len(transport)]
             if cross_products.volume >= selected_track.volume:
                 cross_products.to_restriction(selected_track.volume)

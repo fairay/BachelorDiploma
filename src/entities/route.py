@@ -142,7 +142,7 @@ class Route:
             if load: return len(self.nodes) - 1 - index
 
     def find_warehouse(self, empty_route=False):
-        for node, load in zip(self.nodes, self.loads):
+        for node, load in zip(self.nodes[::-1], self.loads[::-1]):
             if isinstance(node, Warehouse) and (not load.is_empty() or empty_route):
                 return node
 
