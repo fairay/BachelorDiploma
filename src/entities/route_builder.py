@@ -121,9 +121,7 @@ class RouteBuilder(object):
         all_routes.sort(key=lambda route: route.dist)
         return all_routes
 
-    def _min_elem_routes(self) -> RouteList:
-        all_routes = self._init_routes()
-
+    def _distribute_products(self, all_routes: RouteList):
         transport = self.sys.transport
         routes = RouteList()
 
@@ -148,6 +146,33 @@ class RouteBuilder(object):
             r.set_load(w_node, deepcopy(cross_products))
             r.set_load(c_node, deepcopy(cross_products))
             routes.append(r)
+
+        return routes
+
+    def _init_long_routes(self, target_nodes: List[Consumer]) -> RouteList:
+        self.road_map.find_routes(self.sys.parking)
+
+        all_routes = RouteList()
+        for c_node in target_nodes:
+            for w_node in self.sys.warehouses:
+                if w_node.is_linked(c_node):
+                    continue
+                route_w = copy(self.road_map.route(self.sys.parking, w_node))
+                route_c = copy(self.road_map.route(w_node, c_node))
+                route_w.prolong(route_c)
+                all_routes.append(route_w)
+
+        all_routes.sort(key=lambda route: route.dist)
+        return all_routes
+
+    def _min_elem_routes(self) -> RouteList:
+        all_routes = self._init_routes()
+        routes = self._distribute_products(all_routes)
+
+        unsatisfied = list(filter(lambda c: not self.orders[c].is_empty(), self.sys.consumers))
+        if len(unsatisfied):
+            long_routes = self._init_long_routes(unsatisfied)
+            routes += self._distribute_products(long_routes)
 
         return routes
 
@@ -210,6 +235,7 @@ class RouteBuilder(object):
             upd = self._optimization_iteration(pre_routes)
             if not upd:
                 break
+            print(f'{i} optimization stage done')
         else:
             print(f'Iteration limit {MAX_ITER} reached')
 

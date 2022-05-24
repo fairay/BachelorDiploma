@@ -46,7 +46,7 @@ class RoadMap():
     def route(self, from_node: GeoNode, to_node: GeoNode) -> Route:
         if from_node in self.routes:
             return self.routes[from_node][to_node]
-        elif from_node in self.routes[to_node]:
+        elif to_node in self.routes and from_node in self.routes[to_node]:
             return self.routes[to_node][from_node].inverse()
         else:
             self.find_routes(from_node)
