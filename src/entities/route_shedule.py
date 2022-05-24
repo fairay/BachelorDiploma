@@ -44,11 +44,11 @@ class RouteSchedule(Route):
         current_time = self._begin
 
         last_node: Optional[GeoNode] = None
-        for node, load in zip(self.nodes, self.loads):
+        for node, load, i in zip(self.nodes, self.loads, range(len(self.nodes))):
             if last_node:
                 current_time += dt.timedelta(minutes=last_node.linked[node].time)
 
-            if load.amount or isinstance(node, Parking):
+            if load.amount or i in (0, len(self.nodes) - 1):
                 interval = self.intervals[type(node)]
             else:
                 interval = dt.timedelta(0)

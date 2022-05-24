@@ -4,7 +4,7 @@ import random
 import plotly as py
 import plotly.figure_factory as ff
 
-from entities import TransportSystem
+from entities import TransportSystem, Parking, Warehouse, Consumer
 from entities.route_shedule import RouteScheduleList
 
 
@@ -26,15 +26,23 @@ def schedule_dict(sys: TransportSystem, routes: RouteScheduleList):
             operation['Finish'] = t2
             operation['Node'] = node.name
             df.append(operation)
-    df.sort(key=lambda x: x["Task"])
+    df.sort(key=lambda x: x["Node"])
     return df
+
+
+r = lambda: random.randint(0, 255)
+rng = lambda low, high: random.randint(low, high)
+color_scheme = {
+    Parking: lambda: '#%02X%02X%02X' % (255, 0, 0),
+    Warehouse: lambda: '#%02X%02X%02X' % (0, rng(0, 170), rng(220, 255)),
+    Consumer: lambda: '#%02X%02X%02X' % (rng(0, 170), rng(220, 255), 0)
+}
 
 
 def draw_schedule(sys: TransportSystem, routes: RouteScheduleList):
     df = schedule_dict(sys, routes)
 
-    r = lambda: random.randint(0, 255)
-    colors = ['#%02X%02X%02X' % (r(), r(), r()) for node in sys.nodes]
+    colors = {node.name: color_scheme[type(node)]() for node in sys.nodes}
 
     return ff.create_gantt(df, index_col='Node', colors=colors,
                            title='График маршрутов', show_colorbar=True,
@@ -44,4 +52,4 @@ def draw_schedule(sys: TransportSystem, routes: RouteScheduleList):
 
 def draw_grant(sys: TransportSystem, routes: RouteScheduleList):
     fig = draw_schedule(sys, routes)
-    py.offline.plot(fig, filename='gantt')
+    py.offline.plot(fig, filename='gantt.html')

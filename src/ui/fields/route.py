@@ -1,10 +1,11 @@
+import datetime as dt
 from typing import Callable, Any
 
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy
 
 from entities.route_shedule import RouteSchedule
-import datetime as dt
+
 
 class RouteField(QWidget):
     route: RouteSchedule
