@@ -1,10 +1,25 @@
 import random
 import time
+from typing import List
 
-from entities import TransportSystem, RouteBuilder
 import matplotlib.pyplot as plt
 
+from entities import TransportSystem, RouteBuilder
 from system_generator import random_system
+
+
+def smooth(old: List[float]) -> List[float]:
+    new = [old[0]]
+    for i in range(1, len(old) - 1):
+        if i + 3 < len(old):
+            old[i] = min(old[i], max(old[i+1:i+4]))
+        if i - 3 >= 0:
+            old[i] = max(old[i], min(old[i-3:i]))
+
+        val = old[i - 1] + old[i] + old[i + 1]
+        new.append(val / 3)
+    new.append(old[-1])
+    return new
 
 
 def one_case(sys: TransportSystem):
@@ -33,8 +48,29 @@ def one_case(sys: TransportSystem):
     plt.suptitle(f'Система из {len(sys.nodes)} пунктов')
     plt.show()
 
+
+def cmp_parking_dist():
+    size = 50
+
+    dist = []
+    cost = []
+    for i in range(100):
+        tsys = random_system(size, size // 10, seed=10)
+        routes, stat = RouteBuilder(tsys).stat_calc_routes()
+        dist.append(stat[0]['avg_parking_dist'])
+        cost.append(stat[-1]['cost'])
+
+    cost = [x for _, x in sorted(zip(dist, cost))]
+    cost = smooth(smooth(cost))
+    dist.sort()
+
+    plt.plot(dist, cost)
+    plt.ylabel('стоимость плана')
+    plt.xlabel('среднее расстояние до парковки')
+    plt.show()
+
+
 def cmp_optimize(sizes):
-    repeat_n = 2
     init_cost = []
     end_cost = []
 
@@ -42,7 +78,7 @@ def cmp_optimize(sizes):
         init_aver = 0.0
         end_aver = 0.0
 
-        repeat_n = max(2, 100 // size) * 2
+        repeat_n = max(2, 100 // size)
         for i in range(repeat_n):
             tsys = random_system(size, size // 10, seed=random.randint(0, 10000))
             init_routes = RouteBuilder(tsys).calc_routes(0)
@@ -54,12 +90,17 @@ def cmp_optimize(sizes):
         end_cost.append(end_aver / repeat_n)
         print(f'{size} DONE')
 
+    init_cost.sort()
+    end_cost.sort()
+    init_cost, end_cost = smooth(init_cost), smooth(end_cost)
+
     plt.plot(list(sizes), init_cost, label='начальный план')
     plt.plot(list(sizes), end_cost, label='оптимизированный план')
     plt.ylabel('стоимость плана')
     plt.xlabel('количество пунктов')
     plt.legend()
     plt.show()
+
 
 def time_research(sizes):
     repeat_n = 1
@@ -79,6 +120,7 @@ def time_research(sizes):
     plt.xlabel('количество пунктов')
     plt.plot(list(sizes), times)
     plt.show()
+
 
 def cmp_truck():
     repeat_n = 2
@@ -124,10 +166,12 @@ def cmp_prod():
     plt.xlabel('избыток продуктов')
     plt.show()
 
+
 if __name__ == '__main__':
+    cmp_parking_dist()
     # cmp_truck()
-    # cmp_optimize(range(20, 86, 5))
+    # cmp_optimize(range(80, 181, 10))
     # time_research(list(range(20, 100, 5)) + list(range(100, 146, 15)))
     # tsys = random_system(100, 10)
     # one_case(tsys)
-    cmp_prod()
+    # cmp_prod()

@@ -113,7 +113,9 @@ class RouteBuilder(object):
 
         avg_dist = sum(r.dist for r in routes) / len(routes)
         avg_full = sum(r.occupancy for r in routes) / len(routes)
-        stat_list.append({'cost': routes.cost, 'len': len(routes), 'avg_dist': avg_dist, 'avg_full': avg_full})
+        avg_parking_dist = sum(dist[1].dist for dist in self.road_map.routes[self.sys.parking].items())
+        stat_list.append({'cost': routes.cost, 'len': len(routes),
+                          'avg_dist': avg_dist, 'avg_full': avg_full, 'avg_parking_dist': avg_parking_dist})
 
         for i in range(MAX_ITER):
             upd = self._optimization_iteration(routes)
