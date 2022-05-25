@@ -301,9 +301,15 @@ class RouteBuilder(object):
         return disc
 
     def _merge_discrepancy(self, disc: Dict[str, ProductDisc]) -> List[Tuple[float, GeoNode, GeoNode]]:
-        merged_disc = []
+        prod_min: Dict[GeoNode, Tuple[float, GeoNode, GeoNode]] = defaultdict(lambda: (1e10, None, None))
+        # merged_disc: List[Tuple[float, GeoNode, GeoNode]] = []
         for prod, prod_disc in disc.items():
-            merged_disc += prod_disc
+            for val in prod_disc:
+                if val[0] < prod_min[val[2]][0]:
+                    prod_min[val[2]] = val
+            # merged_disc += prod_disc
+
+        merged_disc = [val for val in prod_min.values()]
 
         merged_disc.sort(key=lambda x: x[0])
         return merged_disc

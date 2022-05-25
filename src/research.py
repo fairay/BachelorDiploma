@@ -11,43 +11,55 @@ from system_generator import random_system
 def smooth(old: List[float]) -> List[float]:
     new = [old[0]]
     for i in range(1, len(old) - 1):
-        if i + 3 < len(old):
-            old[i] = min(old[i], max(old[i+1:i+4]))
-        if i - 3 >= 0:
-            old[i] = max(old[i], min(old[i-3:i]))
+        # if i + 3 < len(old):
+        #     old[i] = min(old[i], max(old[i+1:i+4]))
+        # if i - 3 >= 0:
+        #     old[i] = max(old[i], min(old[i-3:i]))
 
-        val = old[i - 1] + old[i] + old[i + 1]
-        new.append(val / 3)
+        val = old[i - 1] + 2 * old[i] + old[i + 1]
+        new.append(val / 4)
     new.append(old[-1])
     return new
 
 
 def one_case(sys: TransportSystem):
     routes, stat = RouteBuilder(sys).stat_calc_routes()
+    label = f'{len(sys.nodes)} пунктов'
 
     plt.subplot(221)
     plt.ylabel('стоимость плана')
     plt.xlabel('количество итераций')
-    plt.plot([a['cost'] for a in stat])
+    plt.plot([a['cost'] for a in stat], label=label)
+    plt.legend()
+
 
     plt.subplot(222)
     plt.ylabel('количество маршрутов')
     plt.xlabel('количество итераций')
-    plt.plot([a['len'] for a in stat])
+    plt.plot([a['len'] for a in stat], label=label)
+    plt.legend()
 
     plt.subplot(223)
     plt.ylabel('средняя протяжённость маршрутов')
     plt.xlabel('количество итераций')
-    plt.plot([a['avg_dist'] for a in stat])
+    plt.plot([a['avg_dist'] for a in stat], label=label)
+    plt.legend()
 
     plt.subplot(224)
     plt.ylabel('средняя занятость транспорта (%)')
     plt.xlabel('количество итераций')
-    plt.plot([a['avg_full'] for a in stat])
+    plt.plot([a['avg_full'] for a in stat], label=label)
+    plt.legend()
 
-    plt.suptitle(f'Система из {len(sys.nodes)} пунктов')
+    # plt.suptitle(f'Система из {len(sys.nodes)} пунктов')
+    # plt.show()
+
+def many_cases():
+    for size in [100, 200]:
+        tsys = random_system(size, size // 10, seed=1)
+        one_case(tsys)
+
     plt.show()
-
 
 def cmp_parking_dist():
     size = 50
@@ -116,7 +128,7 @@ def time_research(sizes):
         print(f'{size:} {aver:}')
         times.append(aver / repeat_n)
 
-    plt.ylabel('время оптимизации (мс)')
+    plt.ylabel('время оптимизации (с)')
     plt.xlabel('количество пунктов')
     plt.plot(list(sizes), times)
     plt.show()
@@ -139,9 +151,11 @@ def cmp_truck():
         end_cost.append(end_aver / repeat_n)
         print(f'{con} DONE')
 
+    end_cost = smooth(end_cost)
+
     plt.plot(con_list, end_cost)
     plt.ylabel('стоимость плана')
-    plt.xlabel('вместительность грузовика')
+    plt.xlabel('вместительность грузовика (м³)')
     plt.show()
 
 
@@ -168,10 +182,11 @@ def cmp_prod():
 
 
 if __name__ == '__main__':
-    cmp_parking_dist()
+    many_cases()
+    # cmp_parking_dist()
     # cmp_truck()
     # cmp_optimize(range(80, 181, 10))
-    # time_research(list(range(20, 100, 5)) + list(range(100, 146, 15)))
+    # time_research(list(range(20, 100, 10)) + list(range(100, 251, 25)))
+    # cmp_prod()
     # tsys = random_system(100, 10)
     # one_case(tsys)
-    # cmp_prod()
