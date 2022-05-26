@@ -140,11 +140,32 @@ class TransportSystem(object):
 
     class Loader:
         @staticmethod
-        def save(sys: 'TransportSystem', f_name: str):
-            with open(f_name, 'w', encoding='utf-8') as f:
-                sys.save_json(f)
+        def pack(sys: 'TransportSystem'):
+            node_id = {node: id for id, node in enumerate(sys.nodes)}
+
+            for node in sys.nodes:
+                node.linked_id = {node_id[other]: road for other, road in node.linked.items()}
+                node.balance = {}
+                del node.linked
 
         @staticmethod
-        def load(f_name: str) -> 'TransportSystem':
+        def unpack(sys: 'TransportSystem'):
+            for node in sys.nodes:
+                if not hasattr(node, 'linked_id'):
+                    continue
+                node.linked = {sys.nodes[node_id]: road for node_id, road in node.linked_id.items()}
+                del node.linked_id
+
+        @classmethod
+        def save(cls, sys: 'TransportSystem', f_name: str):
+            cls.pack(sys)
+            with open(f_name, 'w', encoding='utf-8') as f:
+                sys.save_json(f)
+            cls.unpack(sys)
+
+        @classmethod
+        def load(cls, f_name: str) -> 'TransportSystem':
             with open(f_name, 'r', encoding='utf-8') as f:
-                return TransportSystem.load_json(f)
+                sys = TransportSystem.load_json(f)
+            cls.unpack(sys)
+            return sys

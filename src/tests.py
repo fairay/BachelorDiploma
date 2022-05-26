@@ -30,7 +30,7 @@ class MyTestCase(unittest.TestCase):
         cases = {
             'test1': 1,
             'test2': 3,
-            'test3': 1,
+            'test3': 2,
             'test4': 2,
             'test5': 2,
             'test6': 1,
