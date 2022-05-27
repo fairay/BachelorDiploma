@@ -32,7 +32,6 @@ def one_case(sys: TransportSystem):
     plt.plot([a['cost'] for a in stat], label=label)
     plt.legend()
 
-
     plt.subplot(222)
     plt.ylabel('количество маршрутов')
     plt.xlabel('количество итераций')
@@ -54,12 +53,14 @@ def one_case(sys: TransportSystem):
     # plt.suptitle(f'Система из {len(sys.nodes)} пунктов')
     # plt.show()
 
+
 def many_cases():
     for size in [100, 200]:
         tsys = random_system(size, size // 10, seed=1)
         one_case(tsys)
 
     plt.show()
+
 
 def cmp_parking_dist():
     size = 50
