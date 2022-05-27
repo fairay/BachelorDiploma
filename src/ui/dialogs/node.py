@@ -118,7 +118,7 @@ class NodeDialog(QDialog):
     def delete(self):
         del self.sys[self.source_node]
 
-        self.setResult(1)
+        self.accept()
         self.close()
 
     def add_new_link(self):

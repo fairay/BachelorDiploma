@@ -9,7 +9,7 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from entities import TransportSystem, Parking, Warehouse, Consumer, GeoNode, RouteBuilder, Road
 from entities.route_shedule import RouteScheduleList, RouteSchedule
 from gantt import draw_grant
-from graphics import get_figure
+from graphics import GraphBuilder
 from ui.dialogs import ParkingDialog, WarehouseDialog, ConsumerDialog, NodeDialog
 from ui.dialogs.config import GUIConfig, ConfigDialog
 from ui.dialogs.route import RouteDialog
@@ -154,14 +154,16 @@ class MainWin(QtWidgets.QMainWindow):
         self.unsaved = False
         self.sys_file = file_name
 
-    def build_figure(self):
+    def update_selected(self):
         cur_route_i = self.ui.routeList.currentRow()
-        cur_route = self.routes[cur_route_i] if cur_route_i != -1 else None
+        self.config.cur_route = self.routes[cur_route_i] if cur_route_i != -1 else None
 
         cur_node_i = self.ui.nodeList.currentRow()
-        cur_node = self.sys.nodes[cur_node_i] if cur_node_i != -1 else None
+        self.config.cur_node = self.sys.nodes[cur_node_i] if cur_node_i != -1 else None
 
-        fig = get_figure(self.sys, cur_route, cur_node)
+    def build_figure(self):
+        self.update_selected()
+        fig = GraphBuilder(self.sys, self.config).figure()
 
         g_layout = self.ui.GraphWidget
 
@@ -246,6 +248,6 @@ class MainWin(QtWidgets.QMainWindow):
         form = ConfigDialog(self.config)
         code = form.exec_()
 
-        if code:
+        if form.result():
             self.clean_routes()
             self.render_ui()

@@ -1,13 +1,20 @@
+from typing import Optional
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QHBoxLayout, QSpacerItem, QSizePolicy, QVBoxLayout, QPushButton, \
-    QMessageBox, QLabel, QSlider
+    QMessageBox, QLabel, QSlider, QCheckBox
 
+from entities import Route, GeoNode
 from entities.route_builder import MAX_ITER
 
 
 class GUIConfig(object):
     def __init__(self):
         self.iters = MAX_ITER
+        self.show_labels = True
+
+        self.cur_node: Optional[GeoNode] = None
+        self.cur_route: Optional[Route] = None
 
 
 class ConfigDialog(QDialog):
@@ -39,7 +46,8 @@ class ConfigDialog(QDialog):
         cnt.addItem(QSpacerItem(40, 10, QSizePolicy.Fixed, QSizePolicy.Minimum))
 
         self.title_UI()
-        self.main_UI()
+        self.max_iter_UI()
+        self.show_labels_UI()
         self.buttons_UI()
 
     def title_UI(self):
@@ -49,7 +57,7 @@ class ConfigDialog(QDialog):
     def _upd_iter(self):
         self.iterLabel.setText(f'Максимальное количество итераций: {self.iterW.value()}')
 
-    def main_UI(self):
+    def max_iter_UI(self):
         layout = QVBoxLayout()
 
         self.iterLabel = QLabel('Максимальное количество итераций', self)
@@ -66,6 +74,16 @@ class ConfigDialog(QDialog):
         self.content.addItem(layout)
         self.content.addItem(QSpacerItem(40, 10, QSizePolicy.Fixed, QSizePolicy.Minimum))
 
+    def show_labels_UI(self):
+        layout = QVBoxLayout()
+
+        self.show_labelsW = QCheckBox('Отображать названия', self)
+        self.show_labelsW.setChecked(self.config.show_labels)
+        layout.addWidget(self.show_labelsW)
+
+        self.content.addItem(layout)
+        self.content.addItem(QSpacerItem(40, 10, QSizePolicy.Fixed, QSizePolicy.Minimum))
+
     def buttons_UI(self):
         layout = QHBoxLayout()
 
@@ -77,6 +95,7 @@ class ConfigDialog(QDialog):
 
     def update_config(self):
         self.config.iters = self.iterW.value()
+        self.config.show_labels = self.show_labelsW.isChecked()
 
     def apply(self):
         try:
@@ -85,5 +104,5 @@ class ConfigDialog(QDialog):
             QMessageBox.critical(self, 'Ошибка', str(e))
             return
 
-        self.setResult(1)
+        self.accept()
         self.close()
