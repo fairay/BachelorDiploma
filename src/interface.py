@@ -217,7 +217,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.clean_routes()
         try:
             route_builder = RouteBuilder(self.sys)
-            self.routes = route_builder.calc_routes(self.config.iters)
+            self.routes = route_builder.calc_routes(self.config.iters, self.config.begin_t, self.config.end_t)
             self.routes.sort(key=lambda r: r.begin)
         except Exception as e:
             self.ui.err_msg(str(e))

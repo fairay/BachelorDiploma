@@ -8,6 +8,7 @@ from .road_map import RoadMap
 from .route import Route, RouteList
 from .route_shedule import ScheduleBuilder, RouteScheduleList
 from .system import TransportSystem
+import datetime as dt
 
 MAX_ITER = 1_000
 
@@ -93,14 +94,17 @@ class RouteBuilder(object):
         self.stocks = {w_node: collect_products(w_node.stock) for w_node in self.sys.warehouses}
         self.orders = {c_node: collect_products(c_node.order) for c_node in self.sys.consumers}
 
-    def calc_routes(self, iter_limit: int = MAX_ITER) -> RouteScheduleList:
+    def calc_routes(self, iter_limit: int = MAX_ITER,
+                    begin: dt.timedelta = dt.timedelta(hours=9),
+                    end: dt.timedelta = dt.timedelta(hours=18)
+                    ) -> RouteScheduleList:
         routes = self._min_elem_routes()
         self.sys.init_balance(routes)
 
         routes = self._potential_optimize(routes, iter_limit)
 
         routes = self._close_routes(routes)
-        schedule = ScheduleBuilder(self.sys).build_schedule(routes)
+        schedule = ScheduleBuilder(self.sys).build_schedule(routes, begin, end)
 
         return schedule
 

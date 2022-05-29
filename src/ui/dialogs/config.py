@@ -1,12 +1,13 @@
 from typing import Optional
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTime
 from PyQt5.QtWidgets import QDialog, QHBoxLayout, QSpacerItem, QSizePolicy, QVBoxLayout, QPushButton, \
-    QMessageBox, QLabel, QSlider, QCheckBox
+    QMessageBox, QLabel, QSlider, QCheckBox, QTimeEdit
 
 from entities import Route, GeoNode
 from entities.route_builder import MAX_ITER
 
+import datetime as dt
 
 class GUIConfig(object):
     def __init__(self):
@@ -15,6 +16,9 @@ class GUIConfig(object):
 
         self.cur_node: Optional[GeoNode] = None
         self.cur_route: Optional[Route] = None
+
+        self.begin_t = dt.timedelta(hours=9)
+        self.end_t = dt.timedelta(hours=18)
 
 
 class ConfigDialog(QDialog):
@@ -48,6 +52,9 @@ class ConfigDialog(QDialog):
         self.title_UI()
         self.max_iter_UI()
         self.show_labels_UI()
+        self.schedule_UI()
+
+        self.content.addItem(QSpacerItem(40, 10, QSizePolicy.Fixed, QSizePolicy.Minimum))
         self.buttons_UI()
 
     def title_UI(self):
@@ -82,7 +89,24 @@ class ConfigDialog(QDialog):
         layout.addWidget(self.show_labelsW)
 
         self.content.addItem(layout)
-        self.content.addItem(QSpacerItem(40, 10, QSizePolicy.Fixed, QSizePolicy.Minimum))
+
+    def schedule_UI(self):
+        layout = QHBoxLayout()
+
+        layout.addWidget(QLabel('Рабочий день', self))
+
+        t_str = str(self.config.begin_t)
+        t_new = QTime.fromString(t_str, "h:mm:ss")
+        self.begin_timeW = QTimeEdit(t_new, self)
+        layout.addWidget(self.begin_timeW)
+
+        t_str = str(self.config.end_t)
+        t_new = QTime.fromString(t_str, "h:mm:ss")
+        self.end_timeW = QTimeEdit(t_new, self)
+        layout.addWidget(self.end_timeW)
+
+        self.content.addItem(layout)
+
 
     def buttons_UI(self):
         layout = QHBoxLayout()
@@ -96,6 +120,12 @@ class ConfigDialog(QDialog):
     def update_config(self):
         self.config.iters = self.iterW.value()
         self.config.show_labels = self.show_labelsW.isChecked()
+
+        t = self.begin_timeW.time().toPyTime()
+        self.config.begin_t = dt.timedelta(hours=t.hour, minutes=t.minute)
+
+        t = self.end_timeW.time().toPyTime()
+        self.config.end_t = dt.timedelta(hours=t.hour, minutes=t.minute)
 
     def apply(self):
         try:
