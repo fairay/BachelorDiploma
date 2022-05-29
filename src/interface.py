@@ -249,5 +249,6 @@ class MainWin(QtWidgets.QMainWindow):
         code = form.exec_()
 
         if form.result():
+            self.sys.update_volume(self.config.prod_volume)
             self.clean_routes()
             self.render_ui()

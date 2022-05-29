@@ -2,7 +2,7 @@ from typing import Optional
 
 from PyQt5.QtCore import Qt, QTime
 from PyQt5.QtWidgets import QDialog, QHBoxLayout, QSpacerItem, QSizePolicy, QVBoxLayout, QPushButton, \
-    QMessageBox, QLabel, QSlider, QCheckBox, QTimeEdit
+    QMessageBox, QLabel, QSlider, QCheckBox, QTimeEdit, QDoubleSpinBox
 
 from entities import Route, GeoNode
 from entities.route_builder import MAX_ITER
@@ -19,6 +19,8 @@ class GUIConfig(object):
 
         self.begin_t = dt.timedelta(hours=9)
         self.end_t = dt.timedelta(hours=18)
+
+        self.prod_volume = 0.1
 
 
 class ConfigDialog(QDialog):
@@ -53,6 +55,7 @@ class ConfigDialog(QDialog):
         self.max_iter_UI()
         self.show_labels_UI()
         self.schedule_UI()
+        self.prod_volume_UI()
 
         self.content.addItem(QSpacerItem(40, 10, QSizePolicy.Fixed, QSizePolicy.Minimum))
         self.buttons_UI()
@@ -107,6 +110,18 @@ class ConfigDialog(QDialog):
 
         self.content.addItem(layout)
 
+    def prod_volume_UI(self):
+        layout = QHBoxLayout()
+
+        layout.addWidget(QLabel('Объём тары', self))
+
+        self.prod_volumeW = QDoubleSpinBox(self)
+        self.prod_volumeW.setValue(self.config.prod_volume)
+        self.prod_volumeW.setSingleStep(0.01)
+        layout.addWidget(self.prod_volumeW)
+
+        layout.addWidget(QLabel('м³', self))
+        self.content.addItem(layout)
 
     def buttons_UI(self):
         layout = QHBoxLayout()
@@ -126,6 +141,8 @@ class ConfigDialog(QDialog):
 
         t = self.end_timeW.time().toPyTime()
         self.config.end_t = dt.timedelta(hours=t.hour, minutes=t.minute)
+
+        self.config.prod_volume = self.prod_volumeW.value()
 
     def apply(self):
         try:

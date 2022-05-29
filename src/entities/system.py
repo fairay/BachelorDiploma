@@ -116,6 +116,18 @@ class TransportSystem(object):
         else:
             raise Exception('Unexpected type')
 
+    def update_volume(self, new_vol: float):
+        if abs(self.vol - new_vol) < 1e-4:
+            return
+
+        self.vol = new_vol
+        for cnode in self.consumers:
+            for prod in cnode.order:
+                prod.volume = self.vol
+        for wnode in self.warehouses:
+            for prod in wnode.stock:
+                prod.volume = self.vol
+
     @property
     def transport(self) -> List[Transport]:
         return self.parking.transport
