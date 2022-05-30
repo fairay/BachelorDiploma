@@ -16,7 +16,7 @@ TRUCK_N = 10
 
 def random_system(node_n: int, warehouse_n: int, seed=1, con=5.0, vol=0.1, profit=2.0) -> TransportSystem:
     random.seed(seed)
-    G = nx.soft_random_geometric_graph(node_n, 0.2, seed=seed)
+    G = nx.soft_random_geometric_graph(node_n, 0.5, seed=seed)
     trans = list(range(node_n))
     shuffle(trans)
 

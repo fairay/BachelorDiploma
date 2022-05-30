@@ -183,10 +183,10 @@ def cmp_prod():
 
 
 if __name__ == '__main__':
-    many_cases()
+    # many_cases()
     # cmp_parking_dist()
     # cmp_truck()
-    # cmp_optimize(range(80, 181, 10))
+    cmp_optimize(range(20, 81, 5))
     # time_research(list(range(20, 100, 10)) + list(range(100, 251, 25)))
     # cmp_prod()
     # tsys = random_system(100, 10)
