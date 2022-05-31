@@ -1,253 +1,207 @@
 {
-  "py/object": "entities.system.TransportSystem",
-  "routes": [],
-  "parking": {
-    "py/object": "entities.nodes.parking.Parking",
-    "name": "Стоянка",
-    "balance": {},
-    "transport": [
-      {
-        "py/object": "entities.transport.Transport",
-        "name": "ГАЗель NEXT",
-        "volume": 13.5
-      },
-      {
-        "py/object": "entities.transport.Transport",
-        "name": "ГАЗель NEXT",
-        "volume": 13.5
-      },
-      {
-        "py/object": "entities.transport.Transport",
-        "name": "ГАЗель NEXT",
-        "volume": 13.5
-      }
+    "py/object": "entities.system.TransportSystem",
+    "routes": [],
+    "parking": {
+        "py/object": "entities.nodes.parking.Parking",
+        "name": "Стоянка",
+        "balance": {},
+        "transport": [
+            {
+                "py/object": "entities.transport.Transport",
+                "name": "ГАЗель NEXT",
+                "volume": 1.0
+            },
+            {
+                "py/object": "entities.transport.Transport",
+                "name": "ГАЗель NEXT",
+                "volume": 1.0
+            }
+        ],
+        "linked_id": {
+            "json://1": {
+                "py/object": "entities.road.Road",
+                "dist": 3.0,
+                "time": 11.1
+            },
+            "json://2": {
+                "py/object": "entities.road.Road",
+                "dist": 0.7,
+                "time": 3.4
+            },
+            "json://6": {
+                "py/object": "entities.road.Road",
+                "dist": 1.4,
+                "time": 3.8
+            }
+        }
+    },
+    "warehouses": [
+        {
+            "py/object": "entities.nodes.warehouse.Warehouse",
+            "name": "Склад №1",
+            "balance": {},
+            "stock": {
+                "py/object": "entities.product.ProductList",
+                "py/seq": [
+                    {
+                        "py/object": "entities.product.Product",
+                        "name": "шоколад",
+                        "amount": 10,
+                        "volume": 0.1
+                    }
+                ]
+            },
+            "linked_id": {
+                "json://0": {
+                    "py/id": 8
+                },
+                "json://3": {
+                    "py/object": "entities.road.Road",
+                    "dist": 1.2,
+                    "time": 3.0
+                }
+            }
+        },
+        {
+            "py/object": "entities.nodes.warehouse.Warehouse",
+            "name": "Склад №2",
+            "balance": {},
+            "stock": {
+                "py/object": "entities.product.ProductList",
+                "py/seq": [
+                    {
+                        "py/object": "entities.product.Product",
+                        "name": "шоколад",
+                        "amount": 10,
+                        "volume": 0.1
+                    },
+                    {
+                        "py/object": "entities.product.Product",
+                        "name": "печенье",
+                        "amount": 10,
+                        "volume": 0.1
+                    }
+                ]
+            },
+            "linked_id": {
+                "json://4": {
+                    "py/object": "entities.road.Road",
+                    "dist": 2.3,
+                    "time": 3.0
+                },
+                "json://0": {
+                    "py/id": 9
+                },
+                "json://5": {
+                    "py/object": "entities.road.Road",
+                    "dist": 3.0,
+                    "time": 8.1
+                }
+            }
+        }
     ],
-    "linked_id": {
-      "json://2": {
-        "py/object": "entities.road.Road",
-        "dist": 1.0,
-        "time": 1.0
-      },
-      "json://3": {
-        "py/object": "entities.road.Road",
-        "dist": 1.0,
-        "time": 1.0
-      },
-      "json://1": {
-        "py/object": "entities.road.Road",
-        "dist": 1.0,
-        "time": 1.0
-      }
-    }
-  },
-  "warehouses": [
-    {
-      "py/object": "entities.nodes.warehouse.Warehouse",
-      "name": "Склад №1",
-      "balance": {
-        "шоколад": 0
-      },
-      "stock": {
-        "py/object": "entities.product.ProductList",
-        "py/seq": [
-          {
-            "py/object": "entities.product.Product",
-            "name": "шоколад",
-            "amount": 10,
-            "volume": 0.1
-          }
-        ]
-      },
-      "linked_id": {
-        "json://0": {
-          "py/id": 11
+    "consumers": [
+        {
+            "py/object": "entities.nodes.consumer.Consumer",
+            "name": "Магазин №1",
+            "balance": {},
+            "order": {
+                "py/object": "entities.product.ProductList",
+                "py/seq": [
+                    {
+                        "py/object": "entities.product.Product",
+                        "name": "шоколад",
+                        "amount": 4,
+                        "volume": 0.1
+                    }
+                ]
+            },
+            "linked_id": {
+                "json://1": {
+                    "py/id": 17
+                },
+                "json://4": {
+                    "py/object": "entities.road.Road",
+                    "dist": 2.0,
+                    "time": 5.2
+                }
+            }
         },
-        "json://2": {
-          "py/object": "entities.road.Road",
-          "dist": 1.0,
-          "time": 1.0
+        {
+            "py/object": "entities.nodes.consumer.Consumer",
+            "name": "Магазин №2",
+            "balance": {},
+            "order": {
+                "py/object": "entities.product.ProductList",
+                "py/seq": [
+                    {
+                        "py/object": "entities.product.Product",
+                        "name": "шоколад",
+                        "amount": 4,
+                        "volume": 0.1
+                    }
+                ]
+            },
+            "linked_id": {
+                "json://2": {
+                    "py/id": 24
+                },
+                "json://3": {
+                    "py/id": 32
+                }
+            }
         },
-        "json://5": {
-          "py/object": "entities.road.Road",
-          "dist": 1.0,
-          "time": 1.0
+        {
+            "py/object": "entities.nodes.consumer.Consumer",
+            "name": "Магазин №3",
+            "balance": {},
+            "order": {
+                "py/object": "entities.product.ProductList",
+                "py/seq": [
+                    {
+                        "py/object": "entities.product.Product",
+                        "name": "печенье",
+                        "amount": 1,
+                        "volume": 0.1
+                    }
+                ]
+            },
+            "linked_id": {
+                "json://2": {
+                    "py/id": 25
+                },
+                "json://6": {
+                    "py/object": "entities.road.Road",
+                    "dist": 2.3,
+                    "time": 5.0
+                }
+            }
         },
-        "json://6": {
-          "py/object": "entities.road.Road",
-          "dist": 1.0,
-          "time": 1.0
+        {
+            "py/object": "entities.nodes.consumer.Consumer",
+            "name": "Магазин №4",
+            "balance": {},
+            "order": {
+                "py/object": "entities.product.ProductList",
+                "py/seq": [
+                    {
+                        "py/object": "entities.product.Product",
+                        "name": "печенье",
+                        "amount": 4,
+                        "volume": 0.1
+                    }
+                ]
+            },
+            "linked_id": {
+                "json://0": {
+                    "py/id": 10
+                },
+                "json://5": {
+                    "py/id": 43
+                }
+            }
         }
-      }
-    },
-    {
-      "py/object": "entities.nodes.warehouse.Warehouse",
-      "name": "Склад №2",
-      "balance": {
-        "кола": 7,
-        "кофе": 10
-      },
-      "stock": {
-        "py/object": "entities.product.ProductList",
-        "py/seq": [
-          {
-            "py/object": "entities.product.Product",
-            "name": "кола",
-            "amount": 10,
-            "volume": 0.1
-          },
-          {
-            "py/object": "entities.product.Product",
-            "name": "кофе",
-            "amount": 20,
-            "volume": 0.1
-          }
-        ]
-      },
-      "linked_id": {
-        "json://0": {
-          "py/id": 9
-        },
-        "json://5": {
-          "py/object": "entities.road.Road",
-          "dist": 1.0,
-          "time": 1.0
-        },
-        "json://1": {
-          "py/id": 18
-        }
-      }
-    },
-    {
-      "py/object": "entities.nodes.warehouse.Warehouse",
-      "name": "Склад №3",
-      "balance": {
-        "кола": 0,
-        "шоколад": 10
-      },
-      "stock": {
-        "py/object": "entities.product.ProductList",
-        "py/seq": [
-          {
-            "py/object": "entities.product.Product",
-            "name": "кола",
-            "amount": 10,
-            "volume": 0.1
-          },
-          {
-            "py/object": "entities.product.Product",
-            "name": "шоколад",
-            "amount": 20,
-            "volume": 0.1
-          }
-        ]
-      },
-      "linked_id": {
-        "json://0": {
-          "py/id": 10
-        },
-        "json://4": {
-          "py/object": "entities.road.Road",
-          "dist": 1.0,
-          "time": 1.0
-        }
-      }
-    }
-  ],
-  "consumers": [
-    {
-      "py/object": "entities.nodes.consumer.Consumer",
-      "name": "Потребитель №1",
-      "balance": {
-        "кола": -5,
-        "шоколад": 0
-      },
-      "order": {
-        "py/object": "entities.product.ProductList",
-        "py/seq": [
-          {
-            "py/object": "entities.product.Product",
-            "name": "кола",
-            "amount": 15,
-            "volume": 0.1
-          },
-          {
-            "py/object": "entities.product.Product",
-            "name": "шоколад",
-            "amount": 10,
-            "volume": 0.1
-          }
-        ]
-      },
-      "linked_id": {
-        "json://3": {
-          "py/id": 34
-        }
-      }
-    },
-    {
-      "py/object": "entities.nodes.consumer.Consumer",
-      "name": "Потребитель №2",
-      "balance": {
-        "кола": 0,
-        "шоколад": 0,
-        "кофе": 0
-      },
-      "order": {
-        "py/object": "entities.product.ProductList",
-        "py/seq": [
-          {
-            "py/object": "entities.product.Product",
-            "name": "кола",
-            "amount": 3,
-            "volume": 0.1
-          },
-          {
-            "py/object": "entities.product.Product",
-            "name": "шоколад",
-            "amount": 5,
-            "volume": 0.1
-          },
-          {
-            "py/object": "entities.product.Product",
-            "name": "кофе",
-            "amount": 10,
-            "volume": 0.1
-          }
-        ]
-      },
-      "linked_id": {
-        "json://2": {
-          "py/id": 27
-        },
-        "json://1": {
-          "py/id": 19
-        }
-      }
-    },
-    {
-      "py/object": "entities.nodes.consumer.Consumer",
-      "name": "Потребитель №3",
-      "balance": {
-        "шоколад": 0
-      },
-      "order": {
-        "py/object": "entities.product.ProductList",
-        "py/seq": [
-          {
-            "py/object": "entities.product.Product",
-            "name": "шоколад",
-            "amount": 5,
-            "volume": 0.1
-          }
-        ]
-      },
-      "linked_id": {
-        "json://1": {
-          "py/id": 20
-        }
-      }
-    }
-  ],
-  "con": 1.0,
-  "vol": 0.1
+    ],
+    "con": 1.0,
+    "vol": 0.1
 }
