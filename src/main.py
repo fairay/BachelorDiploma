@@ -18,7 +18,7 @@ def main(tsys: TransportSystem):
 
 
 if __name__ == '__main__':
-    tsys = random_system(100, 10)
+    tsys = None # random_system(100, 10, radius=0.2)
     # TransportSystem.Loader.save(tsys, './configs/rnd100.json')
     # route_builder = RouteBuilder(init_system())
     # routes = route_builder.calc_routes()

@@ -27,26 +27,26 @@ def one_case(sys: TransportSystem):
     label = f'{len(sys.nodes)} пунктов'
 
     plt.subplot(221)
-    plt.ylabel('стоимость плана')
-    plt.xlabel('количество итераций')
+    plt.ylabel('длительность маршрутов, км')
+    plt.xlabel('количество итераций, шт')
     plt.plot([a['cost'] for a in stat], label=label)
     plt.legend()
 
     plt.subplot(222)
-    plt.ylabel('количество маршрутов')
-    plt.xlabel('количество итераций')
+    plt.ylabel('количество маршрутов, шт')
+    plt.xlabel('количество итераций, шт')
     plt.plot([a['len'] for a in stat], label=label)
     plt.legend()
 
     plt.subplot(223)
-    plt.ylabel('средняя протяжённость маршрутов')
-    plt.xlabel('количество итераций')
+    plt.ylabel('средняя протяжённость маршрутов, км')
+    plt.xlabel('количество итераций, шт')
     plt.plot([a['avg_dist'] for a in stat], label=label)
     plt.legend()
 
     plt.subplot(224)
-    plt.ylabel('средняя занятость транспорта (%)')
-    plt.xlabel('количество итераций')
+    plt.ylabel('средняя занятость транспорта, %')
+    plt.xlabel('количество итераций, шт')
     plt.plot([a['avg_full'] for a in stat], label=label)
     plt.legend()
 
@@ -54,8 +54,8 @@ def one_case(sys: TransportSystem):
     # plt.show()
 
 
-def many_cases():
-    for size in [100, 200]:
+def many_cases(sizes):
+    for size in sizes:
         tsys = random_system(size, size // 10, seed=1)
         one_case(tsys)
 
@@ -107,11 +107,12 @@ def cmp_optimize(sizes):
     end_cost.sort()
     init_cost, end_cost = smooth(init_cost), smooth(end_cost)
 
-    plt.plot(list(sizes), init_cost, label='начальный план')
+    plt.plot(list(sizes), init_cost, label='начальный план', linestyle='dotted')
     plt.plot(list(sizes), end_cost, label='оптимизированный план')
-    plt.ylabel('стоимость плана')
-    plt.xlabel('количество пунктов')
-    plt.legend()
+    plt.ylabel('длительность маршрутов, км', fontsize=18)
+    plt.xlabel('количество пунктов, шт', fontsize=18)
+    plt.title('Сравнение длительности маршрутов\nдо и после оптимизации', fontsize=18)
+    plt.legend(prop={'size': 14})
     plt.show()
 
 
@@ -129,8 +130,9 @@ def time_research(sizes):
         print(f'{size:} {aver:}')
         times.append(aver / repeat_n)
 
-    plt.ylabel('время оптимизации (с)')
-    plt.xlabel('количество пунктов')
+    plt.ylabel('время оптимизации, с', fontsize=18)
+    plt.xlabel('количество пунктов, шт', fontsize=18)
+    plt.title('Временные характеристики программы', fontsize=18)
     plt.plot(list(sizes), times)
     plt.show()
 
@@ -155,8 +157,8 @@ def cmp_truck():
     end_cost = smooth(end_cost)
 
     plt.plot(con_list, end_cost)
-    plt.ylabel('стоимость плана')
-    plt.xlabel('вместительность грузовика (м³)')
+    plt.ylabel('длительность маршрутов, км')
+    plt.xlabel('вместительность грузовика, м³')
     plt.show()
 
 
@@ -177,16 +179,33 @@ def cmp_prod():
         print(f'{profit} DONE')
 
     plt.plot(profit_list, end_cost)
-    plt.ylabel('стоимость плана')
-    plt.xlabel('избыток продуктов')
+    plt.ylabel('длительность маршрутов, км')
+    plt.xlabel('избыток продуктов, разы')
     plt.show()
 
+def main(case):
+    match case:
+        case 'many_cases':
+            # Исследование работы алгоритма (характеристики системы по итерациям)
+            many_cases([100, 200])
+        case 'cmp_optimize_low':
+            # Сравнение длительностей маршрутов
+            cmp_optimize(range(20, 81, 5))
+        case 'cmp_optimize_high':
+            # Сравнение длительностей маршрутов
+            cmp_optimize(range(80, 181, 15))
+        case 'time_research':
+            # Временные характеристики
+            time_research(list(range(20, 100, 10)) + list(range(100, 251, 25)))
+        case _:
+            print(f'no {case} research')
 
 if __name__ == '__main__':
-    # many_cases()
+    main('time_research')
+
     # cmp_parking_dist()
     # cmp_truck()
-    cmp_optimize(range(20, 81, 5))
+
     # time_research(list(range(20, 100, 10)) + list(range(100, 251, 25)))
     # cmp_prod()
     # tsys = random_system(100, 10)

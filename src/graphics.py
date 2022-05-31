@@ -94,5 +94,5 @@ class GraphBuilder:
         self._build_nodes(subp)
 
         if self.signs and self.proxies:
-            plt.legend(self.proxies, self.signs)
+            plt.legend(self.proxies, self.signs, prop={'size': 16})
         return fig
