@@ -113,7 +113,9 @@ class RouteScheduleList(list[RouteSchedule]):
 
 
 class TransportAssignment(dict[Transport, RouteScheduleList]):
-    routes = RouteScheduleList()
+    def __init__(self, dict):
+        super(TransportAssignment, self).__init__(dict)
+        self.routes = RouteScheduleList()
 
     @property
     def earliest_start(self) -> (dt.timedelta | None, Transport):
