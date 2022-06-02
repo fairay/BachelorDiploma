@@ -27,7 +27,7 @@ def one_case(sys: TransportSystem):
     label = f'{len(sys.nodes)} пунктов'
 
     plt.subplot(221)
-    plt.ylabel('длительность маршрутов, км')
+    plt.ylabel('протяжённость маршрутов, км')
     plt.xlabel('количество итераций, шт')
     plt.plot([a['cost'] for a in stat], label=label)
     plt.legend()
@@ -73,13 +73,14 @@ def cmp_parking_dist():
         dist.append(stat[0]['avg_parking_dist'])
         cost.append(stat[-1]['cost'])
 
-    cost = [x for _, x in sorted(zip(dist, cost))]
+    # cost = [x for _, x in sorted(zip(dist, cost))]
+    cost.sort()
     cost = smooth(smooth(cost))
     dist.sort()
 
     plt.plot(dist, cost)
-    plt.ylabel('стоимость плана')
-    plt.xlabel('среднее расстояние до парковки')
+    plt.ylabel('протяжённость маршрутов, км')
+    plt.xlabel('среднее расстояние до парковки, км')
     plt.show()
 
 
@@ -109,9 +110,9 @@ def cmp_optimize(sizes):
 
     plt.plot(list(sizes), init_cost, label='начальный план', linestyle='dotted')
     plt.plot(list(sizes), end_cost, label='оптимизированный план')
-    plt.ylabel('длительность маршрутов, км', fontsize=18)
+    plt.ylabel('протяжённость маршрутов, км', fontsize=18)
     plt.xlabel('количество пунктов, шт', fontsize=18)
-    plt.title('Сравнение длительности маршрутов\nдо и после оптимизации', fontsize=18)
+    plt.title('Сравнение протяжённости маршрутов\nдо и после оптимизации', fontsize=18)
     plt.legend(prop={'size': 14})
     plt.show()
 
@@ -157,7 +158,7 @@ def cmp_truck():
     end_cost = smooth(end_cost)
 
     plt.plot(con_list, end_cost)
-    plt.ylabel('длительность маршрутов, км')
+    plt.ylabel('протяжённость маршрутов, км')
     plt.xlabel('вместительность грузовика, м³')
     plt.show()
 
@@ -179,7 +180,7 @@ def cmp_prod():
         print(f'{profit} DONE')
 
     plt.plot(profit_list, end_cost)
-    plt.ylabel('длительность маршрутов, км')
+    plt.ylabel('протяжённость маршрутов, км')
     plt.xlabel('избыток продуктов, разы')
     plt.show()
 
@@ -189,7 +190,7 @@ def main(case):
             # Исследование работы алгоритма (характеристики системы по итерациям)
             many_cases([100, 200])
         case 'cmp_optimize_low':
-            # Сравнение длительностей маршрутов
+            # Сравнение протяжённости маршрутов
             cmp_optimize(range(20, 81, 5))
         case 'cmp_optimize_high':
             # Сравнение длительностей маршрутов
@@ -201,9 +202,9 @@ def main(case):
             print(f'no {case} research')
 
 if __name__ == '__main__':
-    main('time_research')
+    # main('cmp_optimize_low')
 
-    # cmp_parking_dist()
+    cmp_parking_dist()
     # cmp_truck()
 
     # time_research(list(range(20, 100, 10)) + list(range(100, 251, 25)))
