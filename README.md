@@ -3,6 +3,9 @@
 
 Тема - **Оптимизация планирования грузоперевозок в транспортной системе с использованием метода потенциалов**
 
+<img src="https://img.shields.io/badge/Python-14354C?style=for-the-badge&logo=python&logoColor=white">
+<img src="https://img.shields.io/badge/Made%20with-LaTeX-1f425f.svg">
+
 [РПЗ](paper/main.pdf)
 
 [Исходники](src)
